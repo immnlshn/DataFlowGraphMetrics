@@ -1,4 +1,5 @@
 // main.js - Node-RED Flow Metrics Analyzer
+import './style.css'
 
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');

@@ -1,5 +1,6 @@
 {
   "name": "dataflowgraphmetrics",
+  "private": true,
   "version": "1.0.0",
   "description": "Node-RED Flow Complexity Metrics Analyzer",
   "type": "module",
