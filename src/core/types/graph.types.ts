@@ -13,7 +13,8 @@ export interface Graph {
   getEdgeCount(): number;
   getIncoming(nodeId: string): GraphEdge[];
   getOutgoing(nodeId: string): GraphEdge[];
-  
+  getNeighbors(nodeId: string): string[];
+
   addNode(node: GraphNode): void;
   addEdge(edge: GraphEdge): void;
 }
@@ -41,4 +42,3 @@ export interface ConnectedComponent {
   nodes: Set<string>;
   graph: Graph;
 }
-
