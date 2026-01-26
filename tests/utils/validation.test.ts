@@ -9,6 +9,7 @@ import multiComponent from '../fixtures/multi-component.json';
 import emptyFlow from '../fixtures/empty-flow.json';
 import disabledFlow from '../fixtures/simple-flow-disabled.json';
 import complexBranching from '../fixtures/complex-branching.json';
+import type { NodeRedItem, NodeRedFlowTab } from '../../src/core/types/node-red.types';
 
 describe('Validation Utilities', () => {
   it('should validate a simple flow export', () => {
@@ -37,6 +38,10 @@ describe('Validation Utilities', () => {
 
   it('should reject null input', () => {
     expect(isValidNodeRedExport(null)).toBe(false);
+  });
+
+  it('should reject undefined input', () => {
+    expect(isValidNodeRedExport(undefined)).toBe(false);
   });
 });
 
@@ -68,7 +73,8 @@ describe('Test Fixtures', () => {
   it('should load complex-branching.json and contain at least one switch node', () => {
     expect(complexBranching).toBeDefined();
     expect(Array.isArray(complexBranching)).toBe(true);
-    const switches = complexBranching.filter((item: any) => item.type === 'switch');
+    const complex = complexBranching as NodeRedItem[];
+    const switches = complex.filter(item => item.type === 'switch');
     expect(switches.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -78,10 +84,11 @@ describe('Test Fixtures', () => {
     expect(emptyFlow.length).toBe(0);
   });
 
-  it('should load disabled flow fixture and mark tab disabled', () => {
+  it('should verify disabled flow fixture has disabled tab', () => {
     expect(disabledFlow).toBeDefined();
-    const tabs = disabledFlow.filter((item: any) => item.type === 'tab');
+    const disabled = disabledFlow as NodeRedItem[];
+    const tabs = disabled.filter((item): item is NodeRedFlowTab => item.type === 'tab');
     expect(tabs.length).toBeGreaterThanOrEqual(1);
-    expect((tabs[0] as any).disabled).toBe(true);
+    expect(tabs[0].disabled).toBe(true);
   });
 });
