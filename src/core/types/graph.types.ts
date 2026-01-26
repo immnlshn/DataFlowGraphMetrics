@@ -39,6 +39,7 @@ export interface GraphEdge {
 export interface ConnectedComponent {
   id: string;
   flowId: string;
+  flowName?: string;
   nodes: Set<string>;
   graph: Graph;
 }
