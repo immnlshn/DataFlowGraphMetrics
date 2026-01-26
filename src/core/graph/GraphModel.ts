@@ -5,8 +5,8 @@
 import { Graph, GraphNode, GraphEdge } from '../types/graph.types';
 
 export class GraphModel implements Graph {
-  nodes: Map<string, GraphNode>;
-  edges: GraphEdge[];
+  private nodes: Map<string, GraphNode>;
+  private edges: GraphEdge[];
 
   constructor() {
     this.nodes = new Map();
@@ -81,5 +81,30 @@ export class GraphModel implements Graph {
    */
   hasNode(id: string): boolean {
     return this.nodes.has(id);
+  }
+
+  /**
+   * Get all edges
+   */
+  getEdges(): GraphEdge[] {
+    return [...this.edges];
+  }
+
+  /**
+   * Get all neighbors (undirected) of a node
+   */
+  getNeighbors(nodeId: string): string[] {
+    const neighbors = new Set<string>();
+    
+    for (const edge of this.edges) {
+      if (edge.source === nodeId) {
+        neighbors.add(edge.target);
+      }
+      if (edge.target === nodeId) {
+        neighbors.add(edge.source);
+      }
+    }
+    
+    return Array.from(neighbors);
   }
 }
