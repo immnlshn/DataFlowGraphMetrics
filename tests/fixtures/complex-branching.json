@@ -1,0 +1,176 @@
+[
+  {
+    "id": "d974270e49f7e978",
+    "type": "tab",
+    "label": "Branching Flow",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "efe6b72f1a36cfdd",
+    "type": "inject",
+    "z": "d974270e49f7e978",
+    "name": "Start",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 110,
+    "y": 140,
+    "wires": [
+      [
+        "95f55e918962c89f"
+      ]
+    ]
+  },
+  {
+    "id": "95f55e918962c89f",
+    "type": "switch",
+    "z": "d974270e49f7e978",
+    "name": "Decision 1",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 290,
+    "y": 140,
+    "wires": [
+      [
+        "0ca8fb55cd105c2e"
+      ],
+      [
+        "66d93acc44d8f713"
+      ]
+    ]
+  },
+  {
+    "id": "0ca8fb55cd105c2e",
+    "type": "function",
+    "z": "d974270e49f7e978",
+    "name": "Path A",
+    "func": "\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 80,
+    "wires": [
+      [
+        "7fb0b4eac2c988b5"
+      ]
+    ]
+  },
+  {
+    "id": "66d93acc44d8f713",
+    "type": "switch",
+    "z": "d974270e49f7e978",
+    "name": "Decision 2",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 490,
+    "y": 200,
+    "wires": [
+      [
+        "e2cf105e0b013c25"
+      ],
+      [
+        "877fe7291bb788d5"
+      ]
+    ]
+  },
+  {
+    "id": "7fb0b4eac2c988b5",
+    "type": "debug",
+    "z": "d974270e49f7e978",
+    "name": "Output A",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 660,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "e2cf105e0b013c25",
+    "type": "debug",
+    "z": "d974270e49f7e978",
+    "name": "Output B1",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 660,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "877fe7291bb788d5",
+    "type": "debug",
+    "z": "d974270e49f7e978",
+    "name": "Output B2",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 660,
+    "y": 240,
+    "wires": []
+  }
+]

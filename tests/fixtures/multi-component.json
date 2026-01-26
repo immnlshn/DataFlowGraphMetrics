@@ -1,0 +1,266 @@
+[
+  {
+    "id": "b880287e7ae67ece",
+    "type": "tab",
+    "label": "Component 1",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "c50cadcdcc866c52",
+    "type": "tab",
+    "label": "Component 2",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "1234d6aee7948d81",
+    "type": "inject",
+    "z": "b880287e7ae67ece",
+    "name": "Start 1",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 110,
+    "y": 80,
+    "wires": [
+      [
+        "390b0cbdc6514a97"
+      ]
+    ]
+  },
+  {
+    "id": "390b0cbdc6514a97",
+    "type": "function",
+    "z": "b880287e7ae67ece",
+    "name": "Process",
+    "func": "\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 280,
+    "y": 80,
+    "wires": [
+      [
+        "c6209a6bd9c56dcb"
+      ]
+    ]
+  },
+  {
+    "id": "c6209a6bd9c56dcb",
+    "type": "debug",
+    "z": "b880287e7ae67ece",
+    "name": "Output 1",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 460,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "27afbc752f0f418e",
+    "type": "inject",
+    "z": "b880287e7ae67ece",
+    "name": "Start 2",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 110,
+    "y": 240,
+    "wires": [
+      [
+        "8f34b23f5fdf692c"
+      ]
+    ]
+  },
+  {
+    "id": "8f34b23f5fdf692c",
+    "type": "switch",
+    "z": "b880287e7ae67ece",
+    "name": "Decision",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      },
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 2,
+    "x": 280,
+    "y": 240,
+    "wires": [
+      [
+        "184eb6934945845a"
+      ],
+      [
+        "9fee4e944cce2941"
+      ]
+    ]
+  },
+  {
+    "id": "184eb6934945845a",
+    "type": "debug",
+    "z": "b880287e7ae67ece",
+    "name": "Output 2A",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 460,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "9fee4e944cce2941",
+    "type": "debug",
+    "z": "b880287e7ae67ece",
+    "name": "Output 2B",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 460,
+    "y": 280,
+    "wires": []
+  },
+  {
+    "id": "c5e538968556716c",
+    "type": "inject",
+    "z": "c50cadcdcc866c52",
+    "name": "Start",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 110,
+    "y": 100,
+    "wires": [
+      [
+        "f097e18bd7e3a819"
+      ]
+    ]
+  },
+  {
+    "id": "f097e18bd7e3a819",
+    "type": "function",
+    "z": "c50cadcdcc866c52",
+    "name": "Process 1",
+    "func": "\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 280,
+    "y": 100,
+    "wires": [
+      [
+        "2355efd53372e6ab"
+      ]
+    ]
+  },
+  {
+    "id": "2355efd53372e6ab",
+    "type": "function",
+    "z": "c50cadcdcc866c52",
+    "name": "Process 2",
+    "func": "\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 460,
+    "y": 100,
+    "wires": [
+      [
+        "d0d377227c9a9b0c"
+      ]
+    ]
+  },
+  {
+    "id": "d0d377227c9a9b0c",
+    "type": "debug",
+    "z": "c50cadcdcc866c52",
+    "name": "Output",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 630,
+    "y": 100,
+    "wires": []
+  }
+]

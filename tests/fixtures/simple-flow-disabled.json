@@ -1,0 +1,76 @@
+[
+  {
+    "id": "bf7e6d8113b69153",
+    "type": "tab",
+    "label": "Simple Flow Disabled",
+    "disabled": true,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "c2eae9ba404a97f3",
+    "type": "inject",
+    "z": "bf7e6d8113b69153",
+    "name": "Start",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 90,
+    "y": 80,
+    "wires": [
+      [
+        "54adaf750d028916"
+      ]
+    ]
+  },
+  {
+    "id": "54adaf750d028916",
+    "type": "function",
+    "z": "bf7e6d8113b69153",
+    "name": "Process",
+    "func": "\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 240,
+    "y": 80,
+    "wires": [
+      [
+        "0155e6e6dfb222e7"
+      ]
+    ]
+  },
+  {
+    "id": "0155e6e6dfb222e7",
+    "type": "debug",
+    "z": "bf7e6d8113b69153",
+    "name": "Output",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 390,
+    "y": 80,
+    "wires": []
+  }
+]
