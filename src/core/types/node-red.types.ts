@@ -49,6 +49,14 @@ export function isFlowTab(item: NodeRedItem): item is NodeRedFlowTab {
  * Type guard: check if item is a node
  */
 export function isNode(item: NodeRedItem): item is NodeRedNode {
-  return item.type !== 'tab' && 'wires' in item;
-}
+  if (item.type === 'tab') return false;
 
+  if (!('wires' in item)) return false;
+
+  const maybeWires = (item as any).wires;
+  if (!Array.isArray(maybeWires)) return false;
+
+  return maybeWires.every(
+    (port: unknown) => Array.isArray(port) && port.every(id => typeof id === 'string')
+  );
+}
