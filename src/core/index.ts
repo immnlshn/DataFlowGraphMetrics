@@ -6,6 +6,7 @@
 
 export * from './types/index';
 export * from '../utils/validation';
+export { logReport, formatReportJSON } from '../utils/logger';
 
 export { FlowAnalyzer } from './FlowAnalyzer';
 
@@ -25,12 +26,12 @@ export const VERSION = '0.1.0';
  * 
  * @example
  * ```typescript
- * import { analyzeFlow } from './core';
+ * import { analyzeFlow, logReport } from './core';
  * 
  * const flowJson = [...]; // Node-RED export
  * const report = analyzeFlow(flowJson);
  * 
- * console.log(`Found ${report.summary.totalComponents} components`);
+ * logReport(report); // Pretty-print to console
  * ```
  */
 export function analyzeFlow(flowJson: unknown): AnalysisReport {
