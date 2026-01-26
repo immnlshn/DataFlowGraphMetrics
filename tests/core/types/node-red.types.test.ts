@@ -47,5 +47,33 @@ describe('Node-RED Type Guards', () => {
 
     expect(isFlowTab(node)).toBe(false);
   });
-});
 
+  it('should reject object with non-tab type but missing wires property', () => {
+    const obj = {
+      id: 'missingWires',
+      type: 'custom'
+    };
+
+    expect(isNode(obj)).toBe(false);
+  });
+
+  it('should reject object with non-tab type and null wires', () => {
+    const obj = {
+      id: 'nullWires',
+      type: 'custom',
+      wires: null
+    };
+
+    expect(isNode(obj)).toBe(false);
+  });
+
+  it('should reject object with non-tab type and invalid wires type', () => {
+    const obj = {
+      id: 'invalidWires',
+      type: 'custom',
+      wires: 'invalid'
+    };
+
+    expect(isNode(obj)).toBe(false);
+  });
+});
