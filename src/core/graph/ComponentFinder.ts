@@ -64,9 +64,9 @@ export class ComponentFinder {
     originalGraph: Graph
   ): ConnectedComponent {
     const subgraph = this.extractSubgraph(nodeIds, originalGraph);
-    
+
     return {
-      id: `component-${index}`,
+      id: `${flowId}-component-${index}`,
       flowId,
       nodes: nodeIds,
       graph: subgraph,
