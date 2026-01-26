@@ -8,6 +8,7 @@ import simpleFlow from '../fixtures/simple-flow.json';
 import multiComponent from '../fixtures/multi-component.json';
 import emptyFlow from '../fixtures/empty-flow.json';
 import disabledFlow from '../fixtures/simple-flow-disabled.json';
+import complexBranching from '../fixtures/complex-branching.json';
 
 describe('Validation Utilities', () => {
   it('should validate a simple flow export', () => {
@@ -20,6 +21,10 @@ describe('Validation Utilities', () => {
 
   it('should validate empty flow export', () => {
     expect(isValidNodeRedExport(emptyFlow)).toBe(true);
+  });
+
+  it('should validate complex-branching export', () => {
+    expect(isValidNodeRedExport(complexBranching)).toBe(true);
   });
 
   it('should reject non-array input', () => {
@@ -58,6 +63,13 @@ describe('Test Fixtures', () => {
   it('should have 2 flow tabs in multi-component', () => {
     const tabs = multiComponent.filter(item => item.type === 'tab');
     expect(tabs.length).toBe(2);
+  });
+
+  it('should load complex-branching.json and contain at least one switch node', () => {
+    expect(complexBranching).toBeDefined();
+    expect(Array.isArray(complexBranching)).toBe(true);
+    const switches = complexBranching.filter((item: any) => item.type === 'switch');
+    expect(switches.length).toBeGreaterThanOrEqual(1);
   });
 
   it('should load empty-flow.json', () => {
