@@ -4,3 +4,4 @@
 
 export { GraphModel } from './GraphModel';
 export { GraphBuilder } from './GraphBuilder';
+export { ComponentFinder } from './ComponentFinder';
