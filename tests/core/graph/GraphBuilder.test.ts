@@ -52,7 +52,7 @@ describe('GraphBuilder', () => {
       expect(node1?.metadata.name).toBe('Start');
       expect(node1?.metadata.position).toEqual({ x: 100, y: 100 });
       
-      const edges = graph.edges;
+      const edges = graph.getEdges();
       expect(edges).toContainEqual({ source: 'node1', target: 'node2', sourcePort: 0 });
       expect(edges).toContainEqual({ source: 'node2', target: 'node3', sourcePort: 0 });
     });
@@ -148,7 +148,7 @@ describe('GraphBuilder', () => {
       expect(graph.getNodeCount()).toBe(4);
       expect(graph.getEdgeCount()).toBe(3);
 
-      const edges = graph.edges;
+      const edges = graph.getEdges();
       expect(edges).toContainEqual({ source: 'switch1', target: 'node2', sourcePort: 0 });
       expect(edges).toContainEqual({ source: 'switch1', target: 'node3', sourcePort: 1 });
       expect(edges).toContainEqual({ source: 'switch1', target: 'node4', sourcePort: 2 });
@@ -224,7 +224,7 @@ describe('GraphBuilder', () => {
 
       expect(graph.getEdgeCount()).toBe(2);
       
-      const edges = graph.edges;
+      const edges = graph.getEdges();
       expect(edges).toContainEqual({ source: 'switch1', target: 'node2', sourcePort: 0 });
       expect(edges).toContainEqual({ source: 'switch1', target: 'node3', sourcePort: 2 });
       expect(edges.find(e => e.sourcePort === 1)).toBeUndefined();
@@ -288,9 +288,9 @@ describe('GraphBuilder', () => {
 
       const graph = builder.build(nodes, 'flow1');
 
-      const edge = graph.edges[0];
-      expect(edge.source).toBe('node1');
-      expect(edge.target).toBe('node2');
+      const edges = graph.getEdges();
+      expect(edges[0].source).toBe('node1');
+      expect(edges[0].target).toBe('node2');
 
       expect(graph.getOutgoing('node1')).toHaveLength(1);
       expect(graph.getIncoming('node1')).toHaveLength(0);
@@ -366,7 +366,7 @@ describe('GraphBuilder', () => {
       expect(graph.getNodeCount()).toBe(3);
       expect(graph.getEdgeCount()).toBe(2);
       
-      const edges = graph.edges;
+      const edges = graph.getEdges();
       expect(edges).toContainEqual({ source: 'node1', target: 'node2', sourcePort: 0 });
       expect(edges).toContainEqual({ source: 'node1', target: 'node3', sourcePort: 0 });
       expect(edges.find(e => e.target === 'nonexistent')).toBeUndefined();

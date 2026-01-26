@@ -3,8 +3,19 @@
  */
 
 export interface Graph {
-  nodes: Map<string, GraphNode>;
-  edges: GraphEdge[];
+  getNode(id: string): GraphNode | undefined;
+  getNodes(): GraphNode[];
+  getNodeIds(): string[];
+  getNodeCount(): number;
+  hasNode(id: string): boolean;
+  
+  getEdges(): GraphEdge[];
+  getEdgeCount(): number;
+  getIncoming(nodeId: string): GraphEdge[];
+  getOutgoing(nodeId: string): GraphEdge[];
+  
+  addNode(node: GraphNode): void;
+  addEdge(edge: GraphEdge): void;
 }
 
 export interface GraphNode {

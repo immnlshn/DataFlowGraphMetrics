@@ -13,7 +13,7 @@ describe('Node-RED Type Guards', () => {
       label: 'Test Flow'
     };
 
-    expect(isFlowTab(flowTab)).toBe(true);
+    expect(isFlowTab(flowTab as any)).toBe(true);
   });
 
   it('should identify nodes correctly', () => {
@@ -24,7 +24,7 @@ describe('Node-RED Type Guards', () => {
       wires: [['node2']]
     };
 
-    expect(isNode(node)).toBe(true);
+    expect(isNode(node as any)).toBe(true);
   });
 
   it('should reject tabs as nodes', () => {
@@ -34,7 +34,7 @@ describe('Node-RED Type Guards', () => {
       label: 'Test Flow'
     };
 
-    expect(isNode(flowTab)).toBe(false);
+    expect(isNode(flowTab as any)).toBe(false);
   });
 
   it('should reject nodes as flow tabs', () => {
@@ -45,7 +45,7 @@ describe('Node-RED Type Guards', () => {
       wires: []
     };
 
-    expect(isFlowTab(node)).toBe(false);
+    expect(isFlowTab(node as any)).toBe(false);
   });
 
   it('should reject object with non-tab type but missing wires property', () => {
@@ -54,7 +54,7 @@ describe('Node-RED Type Guards', () => {
       type: 'custom'
     };
 
-    expect(isNode(obj)).toBe(false);
+    expect(isNode(obj as any)).toBe(false);
   });
 
   it('should reject object with non-tab type and null wires', () => {
@@ -64,7 +64,7 @@ describe('Node-RED Type Guards', () => {
       wires: null
     };
 
-    expect(isNode(obj)).toBe(false);
+    expect(isNode(obj as any)).toBe(false);
   });
 
   it('should reject object with non-tab type and invalid wires type', () => {
@@ -74,6 +74,6 @@ describe('Node-RED Type Guards', () => {
       wires: 'invalid'
     };
 
-    expect(isNode(obj)).toBe(false);
+    expect(isNode(obj as any)).toBe(false);
   });
 });

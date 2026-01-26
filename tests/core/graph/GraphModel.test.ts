@@ -96,7 +96,7 @@ describe('GraphModel', () => {
 
       graph.addEdge(edge);
 
-      expect(graph.edges).toContain(edge);
+      expect(graph.getEdges()).toContainEqual(edge);
       expect(graph.getEdgeCount()).toBe(1);
     });
 
