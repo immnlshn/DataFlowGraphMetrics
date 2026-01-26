@@ -61,10 +61,10 @@ describe('Metrics Integration', () => {
       expect(result.metrics.get('edge-count')?.value).toBe(2);
 
       expect(result.metrics.get('fan-in')?.value).toBe(1);
-      expect(result.metrics.get('fan-in')?.metadata.details.avg).toBe(0.67);
+      expect((result.metrics.get('fan-in')?.metadata?.details as any)?.avg).toBe(0.67);
 
       expect(result.metrics.get('fan-out')?.value).toBe(1);
-      expect(result.metrics.get('fan-out')?.metadata.details.avg).toBe(0.67);
+      expect((result.metrics.get('fan-out')?.metadata?.details as any)?.avg).toBe(0.67);
 
       expect(result.metrics.get('density')?.value).toBe(0.3333);
 
@@ -91,10 +91,10 @@ describe('Metrics Integration', () => {
       expect(result.metrics.get('edge-count')?.value).toBe(6);
 
       expect(result.metrics.get('fan-in')?.value).toBe(1);
-      expect(result.metrics.get('fan-in')?.metadata.details.avg).toBe(0.86);
+      expect((result.metrics.get('fan-in')?.metadata?.details as any)?.avg).toBe(0.86);
 
       expect(result.metrics.get('fan-out')?.value).toBe(2);
-      expect(result.metrics.get('fan-out')?.metadata.details.avg).toBe(0.86);
+      expect((result.metrics.get('fan-out')?.metadata?.details as any)?.avg).toBe(0.86);
 
       expect(result.metrics.get('density')?.value).toBe(0.1429);
 
