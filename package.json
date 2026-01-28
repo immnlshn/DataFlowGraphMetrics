@@ -15,10 +15,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cytoscape": "^3.21.9",
+    "@types/cytoscape-dagre": "^2.3.4",
     "@types/node": "^25.0.10",
     "@vitest/coverage-v8": "^4.0.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "cytoscape": "^3.33.1",
+    "cytoscape-dagre": "^2.5.0",
+    "dagre": "^0.8.5"
   }
 }
