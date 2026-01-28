@@ -25,9 +25,8 @@ export class CyclomaticComplexityMetric implements IMetric {
       .map(nodeId => component.graph.getNode(nodeId))
       .filter((n): n is NonNullable<typeof n> => !!n && n.isDecisionNode)
       .map(node => {
-        const outgoing = component.graph.getOutgoing(node.id);
-        const ports = new Set<number>(outgoing.map(e => e.sourcePort));
-        const connectedPortCount = Math.max(1, ports.size);
+        const ports = component.graph.getOutgoingPorts(node.id);
+        const connectedPortCount = ports.size;
         return { id: node.id, connectedPortCount, ports: Array.from(ports) };
       });
 
