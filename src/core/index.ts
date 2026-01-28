@@ -6,7 +6,6 @@
 
 export * from './types/index';
 export * from '../utils/validation';
-export { logReport, formatReportJSON } from '../utils/logger';
 
 export { FlowAnalyzer } from './FlowAnalyzer';
 
