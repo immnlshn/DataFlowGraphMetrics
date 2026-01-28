@@ -67,11 +67,11 @@ describe('NPathComplexityMetric', () => {
     const component = createComponent(graph);
     const result = metric.compute(component);
 
-    // n1 has 2 outputs, n2 has 1 output (but minimum 2)
-    expect(result.value).toBe(4); // 2 * 2
+    // n1 has 2 outputs, n2 has 1 output
+    expect(result.value).toBe(2); // 2 * 1
   });
 
-  it('should use minimum of 2 paths for decision nodes with no/low fan-out', () => {
+  it('should handle decision node with no outputs', () => {
     const graph = new GraphModel();
     graph.addNode({ id: 'n1', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
     graph.addNode({ id: 'n2', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
@@ -79,7 +79,7 @@ describe('NPathComplexityMetric', () => {
     const component = createComponent(graph);
     const result = metric.compute(component);
 
-    // Decision node with 0 outputs still counts as at least 2 paths
-    expect(result.value).toBe(2);
+    // Decision node with 0 decision paths should not affect the product
+    expect(result.value).toBe(1);
   });
 });
