@@ -4,24 +4,33 @@
 
 import { ConnectedComponent } from './graph.types';
 
-export interface MetricDefinition {
+/**
+ * MetricDefinition - Defines how a metric is computed
+ */
+export type MetricDefinition = Readonly<{
   id: string;
   name: string;
   category: 'size' | 'structural' | 'complexity';
   description: string;
   compute: (component: ConnectedComponent) => MetricResult;
-}
+}>;
 
-export interface MetricResult {
+/**
+ * MetricResult - Immutable result of a metric computation
+ */
+export type MetricResult = Readonly<{
   value: number;
-  metadata?: {
+  metadata?: Readonly<{
     details?: unknown;
     interpretation?: string;
-  };
-}
+  }>;
+}>;
 
-export interface ComponentMetrics {
+/**
+ * ComponentMetrics - Collection of metrics for a component
+ */
+export type ComponentMetrics = Readonly<{
   componentId: string;
-  metrics: Map<string, MetricResult>;
-}
+  metrics: ReadonlyMap<string, MetricResult>;
+}>;
 

@@ -8,35 +8,35 @@
 /**
  * Union type: an item is either a flow tab or a node
  */
-export type NodeRedExport = NodeRedItem[];
+export type NodeRedExport = ReadonlyArray<NodeRedItem>;
 
 export type NodeRedItem = NodeRedFlowTab | NodeRedNode;
 
 /**
  * Flow tab definition (workspace container)
  */
-export interface NodeRedFlowTab {
+export type NodeRedFlowTab = Readonly<{
   id: string;
   type: 'tab';
   label: string;
   disabled?: boolean;
   info?: string;
   env?: unknown[];
-}
+}>;
 
 /**
  * Node definition - any node in the flow
  */
-export interface NodeRedNode {
+export type NodeRedNode = Readonly<{
   id: string;
   type: string;
-  z?: string;    // Parent flow/tab ID
-  wires: string[][]; // Array of output ports, each containing target node IDs
+  z?: string;
+  wires: ReadonlyArray<ReadonlyArray<string>>;
   x?: number;
   y?: number;
   name?: string;
-  [key: string]: unknown; // Additional properties vary by node type
-}
+  [key: string]: unknown;
+}>;
 
 /**
  * Type guard: check if item is a flow tab

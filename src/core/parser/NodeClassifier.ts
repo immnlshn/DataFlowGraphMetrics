@@ -61,10 +61,10 @@ export class NodeClassifier {
   /**
    * Classify nodes from a list
    */
-  classifyNodes(nodes: NodeRedNode[]): {
-    decisionNodes: NodeRedNode[];
-    regularNodes: NodeRedNode[];
-  } {
+  classifyNodes(nodes: ReadonlyArray<NodeRedNode>): Readonly<{
+    decisionNodes: ReadonlyArray<NodeRedNode>;
+    regularNodes: ReadonlyArray<NodeRedNode>;
+  }> {
     const decisionNodes: NodeRedNode[] = [];
     const regularNodes: NodeRedNode[] = [];
 

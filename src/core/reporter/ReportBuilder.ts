@@ -2,7 +2,7 @@
  * ReportBuilder - Generates structured analysis reports
  */
 
-import { ConnectedComponent } from '../types/graph.types';
+import { ConnectedComponent, GraphData } from '../types/graph.types';
 import { ComponentMetrics } from '../types/metrics.types';
 import { AnalysisReport, ComponentReport } from '../types/report.types';
 
@@ -12,14 +12,14 @@ export class ReportBuilder {
    */
   build(components: ConnectedComponent[], metricsMap: Map<string, ComponentMetrics>): AnalysisReport {
     const componentReports = components
-      .map(c => {
-        const metrics = metricsMap.get(c.id);
+      .map(component => {
+        const metrics = metricsMap.get(component.id);
         if (!metrics) {
-          throw new Error(`No metrics found for component ${c.id}`);
+          throw new Error(`No metrics found for component ${component.id}`);
         }
-        return this.buildComponentReport(c, metrics);
+        return this.buildComponentReport(component, metrics);
       })
-      .sort((a, b) => a.id.localeCompare(b.id)); // Deterministic ordering
+      .sort((a, b) => a.id.localeCompare(b.id));
 
     return {
       summary: {
@@ -32,23 +32,43 @@ export class ReportBuilder {
   }
 
   /**
-   * Build a report for a single component
+   * Build a report for a single component with serializable graph data
    */
   private buildComponentReport(component: ConnectedComponent, componentMetrics: ComponentMetrics): ComponentReport {
-    // Convert Map to plain object with sorted keys for determinism
     const metricsObj: Record<string, any> = {};
     const sortedKeys = Array.from(componentMetrics.metrics.keys()).sort();
-    
+
     for (const key of sortedKeys) {
       metricsObj[key] = componentMetrics.metrics.get(key);
     }
+
+    const graphData = this.extractGraphData(component);
 
     return {
       id: component.id,
       flowId: component.flowId,
       flowName: component.flowName,
+      graph: graphData,
       metrics: metricsObj,
     };
+  }
+
+  /**
+   * Extract serializable graph data from a component
+   */
+  private extractGraphData(component: ConnectedComponent): GraphData {
+    const nodes = Array.from(component.graph.getNodes()).sort((a, b) =>
+      a.id.localeCompare(b.id)
+    );
+    const edges = Array.from(component.graph.getEdges()).sort((a, b) => {
+      const sourceCmp = a.source.localeCompare(b.source);
+      if (sourceCmp !== 0) return sourceCmp;
+      const targetCmp = a.target.localeCompare(b.target);
+      if (targetCmp !== 0) return targetCmp;
+      return a.sourcePort - b.sourcePort;
+    });
+
+    return { nodes, edges };
   }
 
   /**

@@ -10,6 +10,6 @@ export interface IMetric {
   readonly name: string;
   readonly category: 'size' | 'structural' | 'complexity';
   readonly description: string;
-  
+
   compute(component: ConnectedComponent): MetricResult;
 }

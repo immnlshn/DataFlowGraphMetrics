@@ -4,10 +4,10 @@
 
 import { NodeRedExport, NodeRedFlowTab, NodeRedNode, isFlowTab, isNode } from '../types/node-red.types';
 
-export interface ParsedFlow {
-  tabs: NodeRedFlowTab[];
-  nodes: NodeRedNode[];
-}
+export type ParsedFlow = Readonly<{
+  tabs: ReadonlyArray<NodeRedFlowTab>;
+  nodes: ReadonlyArray<NodeRedNode>;
+}>;
 
 export class FlowParser {
   /**
@@ -94,14 +94,14 @@ export class FlowParser {
   /**
    * Get nodes belonging to a specific flow tab
    */
-  getNodesForTab(nodes: NodeRedNode[], tabId: string): NodeRedNode[] {
+  getNodesForTab(nodes: ReadonlyArray<NodeRedNode>, tabId: string): ReadonlyArray<NodeRedNode> {
     return nodes.filter(node => node.z === tabId);
   }
 
   /**
    * Filter out disabled nodes (if they have a 'd' property set to true)
    */
-  filterActiveNodes(nodes: NodeRedNode[]): NodeRedNode[] {
+  filterActiveNodes(nodes: ReadonlyArray<NodeRedNode>): ReadonlyArray<NodeRedNode> {
     return nodes.filter(node => {
       const disabled = (node as any).d;
       return disabled !== true;

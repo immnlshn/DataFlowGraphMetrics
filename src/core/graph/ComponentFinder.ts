@@ -9,7 +9,7 @@ export class ComponentFinder {
   /**
    * Find all connected components in the graph using undirected traversal
    */
-  findComponents(graph: Graph): ConnectedComponent[] {
+  findComponents(graph: Graph, flowName?: string): ConnectedComponent[] {
     const visited = new Set<string>();
     const components: ConnectedComponent[] = [];
     let componentIndex = 0;
@@ -18,11 +18,12 @@ export class ComponentFinder {
       if (!visited.has(nodeId)) {
         const componentNodes = new Set<string>();
         this.dfs(nodeId, graph, visited, componentNodes);
-        
+
         const node = graph.getNode(nodeId)!;
         const component = this.createComponent(
           componentIndex++,
           node.flowId,
+          flowName,
           componentNodes,
           graph
         );
@@ -60,6 +61,7 @@ export class ComponentFinder {
   private createComponent(
     index: number,
     flowId: string,
+    flowName: string | undefined,
     nodeIds: Set<string>,
     originalGraph: Graph
   ): ConnectedComponent {
@@ -68,7 +70,7 @@ export class ComponentFinder {
     return {
       id: `${flowId}-component-${index}`,
       flowId,
-      nodes: nodeIds,
+      flowName,
       graph: subgraph,
     };
   }

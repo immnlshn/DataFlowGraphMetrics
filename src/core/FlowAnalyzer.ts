@@ -49,21 +49,10 @@ export class FlowAnalyzer {
     const allMetrics = new Map<string, ComponentMetrics>();
     
     for (const tab of parsed.tabs) {
-      // Get nodes for this tab
       const nodesForTab = this.parser.getNodesForTab(parsed.nodes, tab.id);
-      
-      // Build graph for this flow
       const graph = this.graphBuilder.build(nodesForTab, tab.id);
-      
-      // Find connected components in the graph
-      const components = this.componentFinder.findComponents(graph);
-      
-      // Set flowName on each component
-      for (const component of components) {
-        component.flowName = tab.label;
-      }
-      
-      // Compute metrics for each component
+      const components = this.componentFinder.findComponents(graph, tab.label);
+
       for (const component of components) {
         const metrics = this.metricsRegistry.computeAll(component);
         allComponents.push(component);

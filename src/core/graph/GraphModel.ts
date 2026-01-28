@@ -30,35 +30,35 @@ export class GraphModel implements Graph {
   /**
    * Get a node by ID
    */
-  getNode(id: string): GraphNode | undefined {
+  getNode(id: string): Readonly<GraphNode> | undefined {
     return this.nodes.get(id);
   }
 
   /**
    * Get all incoming edges for a node
    */
-  getIncoming(nodeId: string): GraphEdge[] {
+  getIncoming(nodeId: string): ReadonlyArray<Readonly<GraphEdge>> {
     return this.edges.filter(edge => edge.target === nodeId);
   }
 
   /**
    * Get all outgoing edges for a node
    */
-  getOutgoing(nodeId: string): GraphEdge[] {
+  getOutgoing(nodeId: string): ReadonlyArray<Readonly<GraphEdge>> {
     return this.edges.filter(edge => edge.source === nodeId);
   }
 
   /**
    * Get all node IDs
    */
-  getNodeIds(): string[] {
+  getNodeIds(): ReadonlyArray<string> {
     return Array.from(this.nodes.keys());
   }
 
   /**
    * Get all nodes as an array
    */
-  getNodes(): GraphNode[] {
+  getNodes(): ReadonlyArray<Readonly<GraphNode>> {
     return Array.from(this.nodes.values());
   }
 
@@ -86,16 +86,16 @@ export class GraphModel implements Graph {
   /**
    * Get all edges
    */
-  getEdges(): GraphEdge[] {
-    return [...this.edges];
+  getEdges(): ReadonlyArray<Readonly<GraphEdge>> {
+    return this.edges;
   }
 
   /**
    * Get all neighbors (undirected) of a node
    */
-  getNeighbors(nodeId: string): string[] {
+  getNeighbors(nodeId: string): ReadonlyArray<string> {
     const neighbors = new Set<string>();
-    
+
     for (const edge of this.edges) {
       if (edge.source === nodeId) {
         neighbors.add(edge.target);
@@ -104,7 +104,7 @@ export class GraphModel implements Graph {
         neighbors.add(edge.source);
       }
     }
-    
+
     return Array.from(neighbors);
   }
 }

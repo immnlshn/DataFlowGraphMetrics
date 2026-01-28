@@ -20,7 +20,7 @@ export class GraphBuilder {
    * @param flowId - The flow/tab ID these nodes belong to
    * @returns GraphModel instance
    */
-  build(nodes: NodeRedNode[], flowId: string): GraphModel {
+  build(nodes: ReadonlyArray<NodeRedNode>, flowId: string): GraphModel {
     const graph = new GraphModel();
 
     // First pass: create all nodes
@@ -91,7 +91,7 @@ export class GraphBuilder {
    * @param nodesByFlow - Map of flow ID to array of nodes
    * @returns Map of flow ID to GraphModel
    */
-  buildMultiple(nodesByFlow: Map<string, NodeRedNode[]>): Map<string, GraphModel> {
+  buildMultiple(nodesByFlow: ReadonlyMap<string, ReadonlyArray<NodeRedNode>>): Map<string, GraphModel> {
     const graphs = new Map<string, GraphModel>();
 
     for (const [flowId, nodes] of nodesByFlow) {
