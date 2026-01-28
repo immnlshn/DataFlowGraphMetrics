@@ -1,78 +1,142 @@
-# DataFlowGraphMetrics
+# DataFlow Graph Metrics
 
-Node-RED Flow Quality Analyzer - A tool for computing structural quality metrics on Node-RED flow graphs.
+A static analysis tool for Node-RED flows that calculates software quality metrics on dataflow graphs.
 
-## 📁 Project Structure
+## Features
 
-```
-src/
-├── core/
-│   ├── types/          # Core type definitions
-│   ├── parser/         # Flow parsing 
-│   ├── graph/          # Graph construction 
-│   ├── metrics/        # Metrics computation 
-│   └── reporter/       # Report generation 
-└── utils/              # Shared utilities
+- **Flow Parsing**: Imports and validates Node-RED flow JSON files
+- **Graph Analysis**: Identifies connected components and builds directed graphs
+- **Metrics Calculation**: Computes various software quality metrics
+    - Size metrics (vertex count, edge count)
+    - Structural metrics (fan-in, fan-out, density)
+    - Complexity metrics (cyclomatic complexity, n-path complexity)
+- **Interactive Visualization**: Web-based UI with graph rendering
+- **JSON Export**: Detailed reports in JSON format
 
-tests/
-├── fixtures/           # Test data
-└── *.test.ts          # Test suites
-```
+## Installation
 
-## 🛠️ Development
-
-### Install Dependencies
 ```bash
 npm install
 ```
 
-### Run Tests
-```bash
-npm test
-```
+## Usage
 
-### Type Check
-```bash
-npm run build
-```
+### Web UI
 
-### Development Server
+Start the development server:
+
 ```bash
 npm run dev
 ```
 
-## 📊 Metrics (Planned)
+Open your browser and navigate to the provided URL (typically `http://localhost:5173`). Upload a Node-RED flow JSON file
+to analyze it.
+
+### CLI
+
+Run metrics analysis via command line:
+
+```bash
+npm run analyze <path-to-flow.json>
+```
+
+### Programmatic API
+
+```typescript
+import { analyzeFlow } from './src/core/index';
+
+const flowJson = /* your Node-RED flow */;
+const report = analyzeFlow(flowJson);
+
+console.log(report.summary);
+console.log(report.components);
+```
+
+## Project Structure
+
+```
+src/
+├── core/                  # Core analysis engine
+│   ├── parser/           # Flow parsing and validation
+│   ├── graph/            # Graph model and algorithms
+│   ├── metrics/          # Metric implementations
+│   └── reporter/         # Report generation
+├── ui/                    # Web interface
+│   ├── GraphView.ts      # Graph visualization
+│   └── graphMapper.ts    # Data mapping for UI
+├── utils/                 # Shared utilities
+└── main.ts               # UI entry point
+
+tests/                     # Test suite
+├── core/                 # Unit and integration tests
+├── integration/          # End-to-end tests
+├── fixtures/             # Test data
+└── utils/                # Utility tests
+```
+
+## Architecture
+
+The system follows a pipeline architecture with clear separation of concerns:
+
+1. **Parser**: Validates and normalizes Node-RED JSON
+2. **Graph Builder**: Constructs directed graph representation
+3. **Component Finder**: Identifies connected components
+4. **Metrics Engine**: Calculates quality metrics
+5. **Reporter**: Generates structured reports
+
+See [ARCHITECTURE.md](./docs/ARCHITECTURE.md) for detailed documentation and diagrams.
+
+## Metrics Reference
 
 ### Size Metrics
-- Vertex Count
-- Edge Count
+
+- **Vertex Count**: Number of nodes in the flow
+- **Edge Count**: Number of connections between nodes
 
 ### Structural Metrics
-- Fan-In
-- Fan-Out
-- Density
+
+- **Fan-In**: Maximum number of incoming edges to any node
+- **Fan-Out**: Maximum number of outgoing edges from any node
+- **Density**: Ratio of actual edges to possible edges
 
 ### Complexity Metrics
-- Cyclomatic Complexity
-- Npath Complexity
 
-## 🏗️ Architecture
+- **Cyclomatic Complexity**: Number of linearly independent paths (decision points + 1)
+- **N-Path Complexity**: Number of execution paths through the flow
 
-The analyzer follows a pipeline architecture:
+## Development
 
-```
-Input (Node-RED JSON)
-  ↓
-Parser (validate & extract)
-  ↓
-Graph Builder (construct directed graph)
-  ↓
-Component Finder (identify connected components)
-  ↓
-Metrics Engine (compute metrics)
-  ↓
-Reporter (generate report)
-  ↓
-Output (Analysis Report JSON)
+### Running Tests
+
+```bash
+npm test
 ```
 
+### Building
+
+```bash
+npm run build
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## Technology Stack
+
+- **TypeScript**: Type-safe development
+- **Vite**: Fast build tool and dev server
+- **Vitest**: Unit and integration testing
+- **Cytoscape.js**: Graph visualization
+- **GitHub Actions**: CI/CD pipeline
+
+## Testing
+
+The project includes comprehensive test coverage:
+
+- **Unit tests**: Individual classes and functions
+- **Integration tests**: Multiple components working together within modules
+- **End-to-end tests**: Full public API through `analyzeFlow()`
+- 200+ tests total validating all functionality
