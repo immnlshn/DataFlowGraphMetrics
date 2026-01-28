@@ -23,13 +23,11 @@ export class GraphBuilder {
   build(nodes: ReadonlyArray<NodeRedNode>, flowId: string): GraphModel {
     const graph = new GraphModel();
 
-    // First pass: create all nodes
     for (const nodeRedNode of nodes) {
       const graphNode = this.createGraphNode(nodeRedNode, flowId);
       graph.addNode(graphNode);
     }
 
-    // Second pass: create edges from wires
     for (const nodeRedNode of nodes) {
       const edges = this.createEdges(nodeRedNode);
       for (const edge of edges) {
@@ -69,11 +67,9 @@ export class GraphBuilder {
   private createEdges(node: NodeRedNode): GraphEdge[] {
     const edges: GraphEdge[] = [];
 
-    // wires is an array of output ports
-    // Each port is an array of target node IDs
     for (let portIndex = 0; portIndex < node.wires.length; portIndex++) {
       const port = node.wires[portIndex];
-      
+
       for (const targetId of port) {
         edges.push({
           source: node.id,

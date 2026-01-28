@@ -81,7 +81,6 @@ export class ComponentFinder {
   private extractSubgraph(nodeIds: Set<string>, graph: Graph): Graph {
     const subgraph = new GraphModel();
 
-    // Add nodes
     for (const nodeId of nodeIds) {
       const node = graph.getNode(nodeId);
       if (node) {
@@ -89,7 +88,6 @@ export class ComponentFinder {
       }
     }
 
-    // Add edges (only those within the component)
     for (const edge of graph.getEdges()) {
       if (nodeIds.has(edge.source) && nodeIds.has(edge.target)) {
         subgraph.addEdge(edge);

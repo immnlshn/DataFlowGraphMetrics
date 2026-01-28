@@ -41,13 +41,10 @@ export class FlowAnalyzer {
    * @returns Analysis report with metrics for all components
    */
   analyze(flowJson: unknown): AnalysisReport {
-    // 1. Parse and validate input
     const parsed = this.parser.parse(flowJson);
-    
-    // 2. Process each flow/tab
     const allComponents = [];
     const allMetrics = new Map<string, ComponentMetrics>();
-    
+
     for (const tab of parsed.tabs) {
       const nodesForTab = this.parser.getNodesForTab(parsed.nodes, tab.id);
       const graph = this.graphBuilder.build(nodesForTab, tab.id);
@@ -59,8 +56,7 @@ export class FlowAnalyzer {
         allMetrics.set(component.id, metrics);
       }
     }
-    
-    // 3. Generate report
+
     return this.reportBuilder.build(allComponents, allMetrics);
   }
 
@@ -69,20 +65,15 @@ export class FlowAnalyzer {
    */
   private initializeMetrics(): MetricsRegistry {
     const registry = new MetricsRegistry();
-    
-    // Size metrics
+
     registry.register(new VertexCountMetric());
     registry.register(new EdgeCountMetric());
-    
-    // Structural metrics
     registry.register(new FanInMetric());
     registry.register(new FanOutMetric());
     registry.register(new DensityMetric());
-    
-    // Complexity metrics
     registry.register(new CyclomaticComplexityMetric());
     registry.register(new NPathComplexityMetric());
-    
+
     return registry;
   }
 }

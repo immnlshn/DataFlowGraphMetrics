@@ -39,7 +39,7 @@ export class NPathComplexityMetric implements IMetric {
 
     const pathMultipliers = decisionNodes.map(node => {
       const fanOut = component.graph.getOutgoing(node!.id).length;
-      return Math.max(fanOut, 2); // Minimum 2 paths per decision
+      return Math.max(fanOut, 2);
     });
 
     const npath = pathMultipliers.reduce((product, multiplier) => product * multiplier, 1);

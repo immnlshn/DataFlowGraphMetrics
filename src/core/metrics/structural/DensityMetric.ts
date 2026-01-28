@@ -17,7 +17,6 @@ export class DensityMetric implements IMetric {
     const V = component.graph.getNodeCount();
     const E = component.graph.getEdgeCount();
 
-    // Edge case: single node or no nodes
     if (V <= 1) {
       return {
         value: 0,
@@ -27,7 +26,6 @@ export class DensityMetric implements IMetric {
       };
     }
 
-    // For directed graph: maximum possible edges = V * (V - 1)
     const maxEdges = V * (V - 1);
     const density = E / maxEdges;
 
