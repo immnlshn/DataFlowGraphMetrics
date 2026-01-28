@@ -25,10 +25,10 @@ describe('ComponentFinder', () => {
       const components = finder.findComponents(graph);
 
       expect(components).toHaveLength(1);
-      expect(components[0].nodes.size).toBe(3);
-      expect(components[0].nodes.has('n1')).toBe(true);
-      expect(components[0].nodes.has('n2')).toBe(true);
-      expect(components[0].nodes.has('n3')).toBe(true);
+      expect(components[0].graph.getNodeCount()).toBe(3);
+      expect(components[0].graph.hasNode('n1')).toBe(true);
+      expect(components[0].graph.hasNode('n2')).toBe(true);
+      expect(components[0].graph.hasNode('n3')).toBe(true);
     });
 
     it('should identify multiple disconnected components', () => {
@@ -52,13 +52,13 @@ describe('ComponentFinder', () => {
       expect(components).toHaveLength(3);
       
       // Find each component
-      const comp1 = components.find(c => c.nodes.has('n1'));
-      const comp2 = components.find(c => c.nodes.has('n3'));
-      const comp3 = components.find(c => c.nodes.has('n5'));
+      const comp1 = components.find(c => c.graph.hasNode('n1'));
+      const comp2 = components.find(c => c.graph.hasNode('n3'));
+      const comp3 = components.find(c => c.graph.hasNode('n5'));
 
-      expect(comp1?.nodes.size).toBe(2);
-      expect(comp2?.nodes.size).toBe(2);
-      expect(comp3?.nodes.size).toBe(1);
+      expect(comp1?.graph.getNodeCount()).toBe(2);
+      expect(comp2?.graph.getNodeCount()).toBe(2);
+      expect(comp3?.graph.getNodeCount()).toBe(1);
     });
 
     it('should handle components with cycles', () => {
@@ -76,10 +76,10 @@ describe('ComponentFinder', () => {
       const components = finder.findComponents(graph);
 
       expect(components).toHaveLength(1);
-      expect(components[0].nodes.size).toBe(3);
-      expect(components[0].nodes.has('n1')).toBe(true);
-      expect(components[0].nodes.has('n2')).toBe(true);
-      expect(components[0].nodes.has('n3')).toBe(true);
+      expect(components[0].graph.getNodeCount()).toBe(3);
+      expect(components[0].graph.hasNode('n1')).toBe(true);
+      expect(components[0].graph.hasNode('n2')).toBe(true);
+      expect(components[0].graph.hasNode('n3')).toBe(true);
     });
 
     it('should handle empty graph', () => {
@@ -101,7 +101,7 @@ describe('ComponentFinder', () => {
 
       expect(components).toHaveLength(3);
       components.forEach(comp => {
-        expect(comp.nodes.size).toBe(1);
+        expect(comp.graph.getNodeCount()).toBe(1);
       });
     });
 
@@ -117,7 +117,7 @@ describe('ComponentFinder', () => {
       const components = finder.findComponents(graph);
 
       expect(components).toHaveLength(1);
-      expect(components[0].nodes.size).toBe(2);
+      expect(components[0].graph.getNodeCount()).toBe(2);
     });
 
     it('should handle complex branching structure', () => {
@@ -144,7 +144,7 @@ describe('ComponentFinder', () => {
       const components = finder.findComponents(graph);
 
       expect(components).toHaveLength(1);
-      expect(components[0].nodes.size).toBe(4);
+      expect(components[0].graph.getNodeCount()).toBe(4);
     });
   });
 
@@ -212,8 +212,8 @@ describe('ComponentFinder', () => {
       components.forEach(comp => {
         expect(comp.graph.getEdgeCount()).toBe(1);
         comp.graph.getEdges().forEach(edge => {
-          expect(comp.nodes.has(edge.source)).toBe(true);
-          expect(comp.nodes.has(edge.target)).toBe(true);
+          expect(comp.graph.hasNode(edge.source)).toBe(true);
+          expect(comp.graph.hasNode(edge.target)).toBe(true);
         });
       });
     });
@@ -229,7 +229,7 @@ describe('ComponentFinder', () => {
       const components = finder.findComponents(graph);
 
       expect(components).toHaveLength(1);
-      expect(components[0].nodes.size).toBe(1);
+      expect(components[0].graph.getNodeCount()).toBe(1);
       expect(components[0].graph.getEdgeCount()).toBe(1);
     });
 
@@ -259,7 +259,7 @@ describe('ComponentFinder', () => {
       const components = finder.findComponents(graph);
 
       expect(components).toHaveLength(1);
-      expect(components[0].nodes.has('n1')).toBe(true);
+      expect(components[0].graph.hasNode('n1')).toBe(true);
       
       const n1InSubgraph = components[0].graph.getNode('n1');
       expect(n1InSubgraph?.isDecisionNode).toBe(true);

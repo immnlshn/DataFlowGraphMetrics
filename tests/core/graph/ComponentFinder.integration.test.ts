@@ -24,7 +24,7 @@ describe('ComponentFinder Integration', () => {
     const components = finder.findComponents(graph);
 
     expect(components).toHaveLength(1);
-    expect(components[0].nodes.size).toBe(3);
+    expect(components[0].graph.getNodeCount()).toBe(3);
   });
 
   it('should find multiple components in multi-component flow', () => {
@@ -41,7 +41,7 @@ describe('ComponentFinder Integration', () => {
     expect(components.length).toBeGreaterThan(1);
     
     // Total nodes should match
-    const totalNodes = components.reduce((sum, c) => sum + c.nodes.size, 0);
+    const totalNodes = components.reduce((sum, c) => sum + c.graph.getNodeCount(), 0);
     expect(totalNodes).toBe(graph.getNodeCount());
   });
 
@@ -55,7 +55,7 @@ describe('ComponentFinder Integration', () => {
 
     // Complex branching should all be connected
     expect(components).toHaveLength(1);
-    expect(components[0].nodes.size).toBe(graph.getNodeCount());
+    expect(components[0].graph.getNodeCount()).toBe(graph.getNodeCount());
   });
 
   it('should create valid subgraphs with all edges', () => {
@@ -68,8 +68,8 @@ describe('ComponentFinder Integration', () => {
     components.forEach(component => {
       // Verify all edges in subgraph are valid
       component.graph.getEdges().forEach(edge => {
-        expect(component.nodes.has(edge.source)).toBe(true);
-        expect(component.nodes.has(edge.target)).toBe(true);
+        expect(component.graph.hasNode(edge.source)).toBe(true);
+        expect(component.graph.hasNode(edge.target)).toBe(true);
       });
     });
   });
@@ -83,7 +83,7 @@ describe('ComponentFinder Integration', () => {
     const components = finder.findComponents(graph);
 
     components.forEach(component => {
-      component.nodes.forEach(nodeId => {
+      component.graph.getNodeIds().forEach(nodeId => {
         const originalNode = graph.getNode(nodeId);
         const subgraphNode = component.graph.getNode(nodeId);
         
@@ -105,7 +105,7 @@ describe('ComponentFinder Integration', () => {
 
     const allComponentNodes = new Set<string>();
     components.forEach(component => {
-      component.nodes.forEach(nodeId => allComponentNodes.add(nodeId));
+      component.graph.getNodeIds().forEach(nodeId => allComponentNodes.add(nodeId));
     });
 
     expect(allComponentNodes.size).toBe(graph.getNodeCount());
@@ -128,7 +128,7 @@ describe('ComponentFinder Integration', () => {
     const nodeToComponent = new Map<string, string>();
     
     components.forEach(component => {
-      component.nodes.forEach(nodeId => {
+      component.graph.getNodeIds().forEach(nodeId => {
         expect(nodeToComponent.has(nodeId)).toBe(false);
         nodeToComponent.set(nodeId, component.id);
       });
@@ -147,7 +147,7 @@ describe('ComponentFinder Integration', () => {
       const components = finder.findComponents(graph);
 
       const allCompNodes = new Set<string>();
-      components.forEach(c => c.nodes.forEach(id => allCompNodes.add(id)));
+      components.forEach(c => c.graph.getNodeIds().forEach(id => allCompNodes.add(id)));
 
       expect(Array.from(allCompNodes)).toHaveLength(graph.getNodeCount());
       expect(components.length).toBeGreaterThanOrEqual(1);

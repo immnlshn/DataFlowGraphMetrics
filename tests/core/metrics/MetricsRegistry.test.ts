@@ -18,16 +18,21 @@ describe('MetricsRegistry', () => {
     category,
     description: 'Mock metric',
     compute: (component: ConnectedComponent): MetricResult => ({
-      value: component.nodes.size
+      value: component.graph.getNodeCount()
     })
   });
 
-  const createMockComponent = (): ConnectedComponent => ({
-    id: 'comp-1',
-    flowId: 'flow-1',
-    nodes: new Set(['n1', 'n2', 'n3']),
-    graph: new GraphModel()
-  });
+  const createMockComponent = (): ConnectedComponent => {
+    const graph = new GraphModel();
+    graph.addNode({ id: 'n1', type: 'test', flowId: 'flow-1', isDecisionNode: false, metadata: {} });
+    graph.addNode({ id: 'n2', type: 'test', flowId: 'flow-1', isDecisionNode: false, metadata: {} });
+    graph.addNode({ id: 'n3', type: 'test', flowId: 'flow-1', isDecisionNode: false, metadata: {} });
+    return {
+      id: 'comp-1',
+      flowId: 'flow-1',
+      graph
+    };
+  };
 
   describe('register', () => {
     it('should register a metric', () => {

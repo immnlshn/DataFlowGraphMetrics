@@ -244,7 +244,6 @@ function createComponent(id: string, flowId: string, flowName?: string): Connect
     id,
     flowId,
     flowName,
-    nodes: new Set<string>(),
     graph,
   };
 }

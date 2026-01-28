@@ -10,7 +10,6 @@ describe('FanOutMetric', () => {
     return {
       id: 'comp-1',
       flowId: 'flow-1',
-      nodes: new Set(graph.getNodeIds()),
       graph
     };
   };

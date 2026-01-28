@@ -4,6 +4,7 @@ import { join } from 'path';
 import { FlowParser } from '../../../src/core/parser/FlowParser';
 import { NodeClassifier } from '../../../src/core/parser/NodeClassifier';
 import { GraphBuilder } from '../../../src/core/graph/GraphBuilder';
+import { NodeRedNode } from '../../../src/core/types/node-red.types';
 
 describe('Graph Integration Tests', () => {
   let parser: FlowParser;
@@ -139,7 +140,7 @@ describe('Graph Integration Tests', () => {
 
       expect(parsed.tabs.length).toBe(2);
 
-      const nodesByFlow = new Map<string, any[]>();
+      const nodesByFlow = new Map<string, ReadonlyArray<NodeRedNode>>();
       for (const tab of parsed.tabs) {
         const nodesForTab = parser.getNodesForTab(parsed.nodes, tab.id);
         nodesByFlow.set(tab.id, nodesForTab);

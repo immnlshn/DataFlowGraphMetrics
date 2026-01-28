@@ -25,7 +25,6 @@ describe('VertexCountMetric', () => {
     return {
       id: 'comp-1',
       flowId: 'flow-1',
-      nodes,
       graph
     };
   };
