@@ -19,10 +19,7 @@ export class CyclomaticComplexityMetric implements IMetric {
   readonly description = 'Measure of independent decision-driven paths (1 + sum(out(n)-1))';
 
   compute(component: ConnectedComponent): MetricResult {
-    const nodeIds = component.graph.getNodeIds();
-    
-    const decisionInfos = nodeIds
-      .map(nodeId => component.graph.getNode(nodeId))
+    const decisionInfos = component.graph.getNodes()
       .filter((n): n is NonNullable<typeof n> => !!n && n.isDecisionNode)
       .map(node => {
         const ports = component.graph.getOutgoingPorts(node.id);
