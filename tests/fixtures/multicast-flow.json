@@ -1,0 +1,114 @@
+[
+  {
+    "id": "b880287e7ae67ece",
+    "type": "tab",
+    "label": "Component 1",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "c046a8fda3f26f44",
+    "type": "inject",
+    "z": "b880287e7ae67ece",
+    "name": "Start",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 110,
+    "y": 100,
+    "wires": [
+      [
+        "52b5010c78425386"
+      ]
+    ]
+  },
+  {
+    "id": "52b5010c78425386",
+    "type": "switch",
+    "z": "b880287e7ae67ece",
+    "name": "Decision",
+    "property": "payload",
+    "propertyType": "msg",
+    "rules": [
+      {
+        "t": "eq",
+        "v": "",
+        "vt": "str"
+      }
+    ],
+    "checkall": "true",
+    "repair": false,
+    "outputs": 1,
+    "x": 300,
+    "y": 100,
+    "wires": [
+      [
+        "3387343915c98e3c",
+        "3020cb6475a8f36a",
+        "7582c741ff6a9e95"
+      ]
+    ]
+  },
+  {
+    "id": "3387343915c98e3c",
+    "type": "debug",
+    "z": "b880287e7ae67ece",
+    "name": "debug 1",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 520,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "3020cb6475a8f36a",
+    "type": "debug",
+    "z": "b880287e7ae67ece",
+    "name": "debug 2",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 520,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "7582c741ff6a9e95",
+    "type": "debug",
+    "z": "b880287e7ae67ece",
+    "name": "debug 3",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 520,
+    "y": 140,
+    "wires": []
+  }
+]

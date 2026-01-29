@@ -141,6 +141,50 @@ describe('Metrics Integration', () => {
     });
   });
 
+  describe('multicast-flow.json', () => {
+    it('should not increase complexity for multicast (parallel execution without branching)', () => {
+      const json = loadFixture('multicast-flow.json');
+      const parsed = parser.parse(json);
+      const flowId = parsed.tabs[0].id;
+      const nodesForTab = parser.getNodesForTab(parsed.nodes, flowId);
+      const graph = builder.build(nodesForTab, flowId);
+      const components = finder.findComponents(graph);
+
+      expect(components).toHaveLength(1);
+      const component = components[0];
+
+      const result = registry.computeAll(component);
+
+      // Structure: inject -> switch (1 output port) -> 3 debug nodes in parallel
+      // This is multicast, not branching, so complexity should remain 1
+      // 5 nodes: inject + switch + 3 debug nodes
+      expect(result.metrics.get('vertex-count')?.value).toBe(5);
+      // 4 edges: inject->switch, switch->debug1, switch->debug2, switch->debug3
+      expect(result.metrics.get('edge-count')?.value).toBe(4);
+
+      // Fan-out should be high due to multicast
+      expect(result.metrics.get('fan-out')?.value).toBe(3);
+
+      // Multicast is parallel execution without branching decision
+      // Switch has only 1 output port, so no branching paths
+      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(1);
+      expect(result.metrics.get('npath-complexity')?.value).toBe(1);
+
+      // Verify the complexity interpretation
+      const ccResult = result.metrics.get('cyclomatic-complexity');
+      expect(ccResult?.metadata?.details).toMatchObject({
+        decisionNodeCount: 1,
+        formula: '1 + sum_{n in D}(out(n) - 1)'
+      });
+
+      const npathResult = result.metrics.get('npath-complexity');
+      expect(npathResult?.metadata?.details).toMatchObject({
+        decisionNodes: 1,
+        pathMultipliers: [1] // Single output port = multiplier of 1
+      });
+    });
+  });
+
   describe('metric categories', () => {
     it('should compute only size metrics', () => {
       const sizeMetrics = registry.getMetricsByCategory('size');
