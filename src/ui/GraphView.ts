@@ -48,7 +48,7 @@ export class GraphView {
       name: 'dagre',
       rankDir: this.layoutOrientation,
       nodeSep: 50,
-      rankSep: 100,
+      rankSep: 30,
       padding: 30
     } as any);
 
@@ -89,6 +89,22 @@ export class GraphView {
         } as any
       },
       {
+        selector: 'node.port-node',
+        style: {
+          'width': 10,
+          'height': 10,
+          'background-color': '#666',
+          'border-width': 1,
+          'border-color': '#fff',
+          'label': 'data(label)',
+          'font-size': '8px',
+          'color': '#fff',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'shape': 'ellipse'
+        } as any
+      },
+      {
         selector: 'edge',
         style: {
           'width': 2,
@@ -96,14 +112,6 @@ export class GraphView {
           'target-arrow-color': '#999',
           'target-arrow-shape': 'triangle',
           'curve-style': 'bezier'
-        } as any
-      },
-      {
-        selector: 'edge.decision-edge',
-        style: {
-          'line-color': '#ff5722',
-          'target-arrow-color': '#ff5722',
-          'width': 2.5
         } as any
       }
     ];
