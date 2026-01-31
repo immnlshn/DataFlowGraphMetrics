@@ -99,7 +99,10 @@ describe('Metrics Integration', () => {
       expect(result.metrics.get('density')?.value).toBe(0.1429);
 
       expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(5);
-      expect(result.metrics.get('npath-complexity')?.value).toBe(4);
+      // NPath: 5 distinct paths through the graph
+      // (switch1 port0→1, switch1 port1→switch2 port0→1, switch1 port1→switch2 port1→1,
+      //  switch1 port1→switch2 catch-all→1, switch1 catch-all→1)
+      expect(result.metrics.get('npath-complexity')?.value).toBe(5);
     });
   });
 
@@ -137,7 +140,8 @@ describe('Metrics Integration', () => {
       expect(r2.metrics.get('fan-out')?.value).toBe(2);
       expect(r2.metrics.get('density')?.value).toBe(0.25);
       expect(r2.metrics.get('cyclomatic-complexity')?.value).toBe(3);
-      expect(r2.metrics.get('npath-complexity')?.value).toBe(2);
+      // NPath: switch with 2 outputs: (2+1) = 3
+      expect(r2.metrics.get('npath-complexity')?.value).toBe(3);
     });
   });
 
@@ -168,7 +172,8 @@ describe('Metrics Integration', () => {
       // Switch with 1 output has 2 branches: pass or catch-all
       // Even though it multicasts, it still introduces branching
       expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(2);
-      expect(result.metrics.get('npath-complexity')?.value).toBe(1);
+      // NPath: switch with 1 output: (1+1) = 2
+      expect(result.metrics.get('npath-complexity')?.value).toBe(2);
 
       // Verify the complexity interpretation
       const ccResult = result.metrics.get('cyclomatic-complexity');
@@ -179,9 +184,11 @@ describe('Metrics Integration', () => {
 
       const npathResult = result.metrics.get('npath-complexity');
       expect(npathResult?.metadata?.details).toMatchObject({
-        decisionNodes: 1,
-        pathMultipliers: [1] // Single output port = multiplier of 1
+        algorithm: 'DFS with memoization and cycle detection',
+        nodeCount: 5
       });
+      // NPath value should be 2 (1 path through switch output + 1 catch-all)
+      expect(npathResult?.value).toBe(2);
     });
   });
 
