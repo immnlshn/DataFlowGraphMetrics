@@ -541,4 +541,83 @@ describe('CyclomaticComplexityMetric', () => {
       expect(result.value).toBe(6);
     });
   });
+
+  describe('cycles', () => {
+    it('should handle simple cycle', () => {
+      // Simple cycle: n1 -> n2 -> n3 -> n2 (back edge)
+      // For CC, cycles don't change the formula: CC = 1 + sum(branches)
+      // No decision nodes, so CC = 1
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n3', target: 'n2', sourcePort: 0 }); // Back edge creates cycle
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(1);
+    });
+
+    it('should handle cycle with decision nodes', () => {
+      // Cycle with switch: inject -> switch -> function -> switch (back edge)
+      // Switch has 2 outputs: one goes to function (which loops back), one goes to debug
+      // Branches from switch: out(n) - 0 = 2 - 0 = 2
+      // CC = 1 + 2 = 3
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n4', sourcePort: 1 });
+      graph.addEdge({ source: 'n3', target: 'n2', sourcePort: 0 }); // Back edge creates cycle
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(3);
+    });
+
+    it('should handle self-loop', () => {
+      // Self-loop: node points to itself
+      // No decision nodes, so CC = 1
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n2', sourcePort: 0 }); // Self-loop
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(1);
+    });
+
+    it('should handle self-loop with decision node', () => {
+      // Self-loop on a switch with 2 outputs
+      // One output loops back to itself, one goes to debug
+      // Branches: 2
+      // CC = 1 + 2 = 3
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n2', sourcePort: 0 }); // Self-loop
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(3);
+    });
+  });
 });
