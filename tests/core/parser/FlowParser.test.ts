@@ -70,6 +70,21 @@ describe('FlowParser', () => {
       expect(result.tabs).toHaveLength(0);
       expect(result.nodes).toHaveLength(0);
     });
+
+    it('should filter out comment nodes', () => {
+      const flowWithComments = [
+        { id: 'tab1', type: 'tab', label: 'Test Flow', disabled: false },
+        { id: 'n1', type: 'inject', z: 'tab1', wires: [['n2']] },
+        { id: 'c1', type: 'comment', z: 'tab1', wires: [] },
+        { id: 'n2', type: 'debug', z: 'tab1', wires: [] },
+      ];
+
+      const result = parser.parse(flowWithComments);
+
+      expect(result.tabs).toHaveLength(1);
+      expect(result.nodes).toHaveLength(2);
+      expect(result.nodes.every(node => node.type !== 'comment')).toBe(true);
+    });
   });
 
   describe('getNodesForTab()', () => {
