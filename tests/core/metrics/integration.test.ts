@@ -98,7 +98,7 @@ describe('Metrics Integration', () => {
 
       expect(result.metrics.get('density')?.value).toBe(0.1429);
 
-      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(3);
+      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(5);
       expect(result.metrics.get('npath-complexity')?.value).toBe(4);
     });
   });
@@ -130,13 +130,13 @@ describe('Metrics Integration', () => {
       expect(r1.metrics.get('cyclomatic-complexity')?.value).toBe(1);
       expect(r1.metrics.get('npath-complexity')?.value).toBe(1);
 
-      // Component 2 (4 nodes, switch)
+      // Component 2 (4 nodes, switch with 2 outputs)
       expect(r2.metrics.get('vertex-count')?.value).toBe(4);
       expect(r2.metrics.get('edge-count')?.value).toBe(3);
       expect(r2.metrics.get('fan-in')?.value).toBe(1);
       expect(r2.metrics.get('fan-out')?.value).toBe(2);
       expect(r2.metrics.get('density')?.value).toBe(0.25);
-      expect(r2.metrics.get('cyclomatic-complexity')?.value).toBe(2);
+      expect(r2.metrics.get('cyclomatic-complexity')?.value).toBe(3);
       expect(r2.metrics.get('npath-complexity')?.value).toBe(2);
     });
   });
@@ -165,16 +165,16 @@ describe('Metrics Integration', () => {
       // Fan-out should be high due to multicast
       expect(result.metrics.get('fan-out')?.value).toBe(3);
 
-      // Multicast is parallel execution without branching decision
-      // Switch has only 1 output port, so no branching paths
-      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(1);
+      // Switch with 1 output has 2 branches: pass or catch-all
+      // Even though it multicasts, it still introduces branching
+      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(2);
       expect(result.metrics.get('npath-complexity')?.value).toBe(1);
 
       // Verify the complexity interpretation
       const ccResult = result.metrics.get('cyclomatic-complexity');
       expect(ccResult?.metadata?.details).toMatchObject({
         decisionNodeCount: 1,
-        formula: '1 + sum_{n in D}(out(n) - 1)'
+        formula: '1 + sum_{n in D} branches(n) where branches vary by node type'
       });
 
       const npathResult = result.metrics.get('npath-complexity');
