@@ -6,9 +6,12 @@
  *   CC(C) = 1 + sum_{n in D(C)} branches(n)
  * where D(C) is the set of decision nodes in the component and
  * branches(n) is calculated based on node type:
- *   - Switch nodes: out(n) - 0 (accounts for implicit catch-all case)
+ *   - Switch nodes: out(n) (accounts for implicit catch-all case)
  *   - Function nodes: out(n) - 1 (standard formula)
- *   - Trigger/Filter nodes: 1 (always 2 branches: pass or block)
+ *   - Trigger/RBE nodes: 1 (always 2 branches: pass or block)
+ *
+ * Complexity: O(V) where V is the number of nodes
+ * Cycles do not affect the calculation - we simply count decision points
  */
 
 import { IMetric } from '../IMetric';
@@ -26,15 +29,13 @@ export class CyclomaticComplexityMetric implements IMetric {
    */
   private calculateBranches(nodeType: string, connectedPortCount: number): number {
     // Switch nodes have an implicit catch-all case
-    // - With 1 output: 2 branches (1 explicit + 1 catch-all), contribute 1
-    // - With 2 outputs: 3 branches (2 explicit + 1 catch-all), contribute 2
-    // - General: out(n) + 1 total branches, contribute out(n)
+    // Total branches = out(n) + 1, so contribution = out(n)
     if (nodeType === 'switch') {
       return connectedPortCount;
     }
 
-    // Trigger and filter nodes always have 2 branches (pass or block)
-    // Regardless of their output configuration
+    // Trigger and RBE nodes always have 2 branches (pass or block)
+    // Contribution = 1 (since 2 branches - 1)
     if (nodeType === 'trigger' || nodeType === 'rbe') {
       return 1;
     }
@@ -45,6 +46,7 @@ export class CyclomaticComplexityMetric implements IMetric {
   }
 
   compute(component: ConnectedComponent): MetricResult {
+    // Get all decision nodes and calculate their branch contributions
     const decisionInfos = component.graph.getNodes()
       .filter((n): n is NonNullable<typeof n> => !!n && n.isDecisionNode)
       .map(node => {
@@ -60,6 +62,7 @@ export class CyclomaticComplexityMetric implements IMetric {
         };
       });
 
+    // Sum all branch contributions
     const sumBranches = decisionInfos.reduce((sum, info) => sum + info.branches, 0);
     const complexity = 1 + sumBranches;
 
