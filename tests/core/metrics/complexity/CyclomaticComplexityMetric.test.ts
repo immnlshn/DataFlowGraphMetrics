@@ -620,4 +620,218 @@ describe('CyclomaticComplexityMetric', () => {
       expect(result.value).toBe(3);
     });
   });
+
+  describe('multicast with branching inside broadcast', () => {
+    it('should count all decision nodes regardless of multicast', () => {
+      // Switch multicasts on port0 to [function1, function2], both have 2 outputs
+      // For CC: multicast doesn't affect counting, we just count decision points
+      //
+      // Structure:
+      // inject -> switch (port0: multicast [n3, n4], port1: n5)
+      //           n3 (2 outputs) -> n6, n7
+      //           n4 (2 outputs) -> n8, n9
+      //
+      // Decision nodes:
+      // - switch: 2 outputs -> contributes 2 (out(n) - 0)
+      // - n3: 2 outputs -> contributes 1 (out(n) - 1)
+      // - n4: 2 outputs -> contributes 1 (out(n) - 1)
+      // CC = 1 + 2 + 1 + 1 = 5
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n6', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n7', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n8', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n9', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 }); // Multicast start
+      graph.addEdge({ source: 'n2', target: 'n4', sourcePort: 0 }); // Multicast (same port)
+      graph.addEdge({ source: 'n2', target: 'n5', sourcePort: 1 }); // Different port
+      graph.addEdge({ source: 'n3', target: 'n6', sourcePort: 0 });
+      graph.addEdge({ source: 'n3', target: 'n7', sourcePort: 1 });
+      graph.addEdge({ source: 'n4', target: 'n8', sourcePort: 0 });
+      graph.addEdge({ source: 'n4', target: 'n9', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(5);
+
+      const details = result.metadata?.details as any;
+      expect(details?.decisionNodeCount).toBe(3); // switch, n3, n4
+    });
+
+    it('should count three-way multicast with branching', () => {
+      // Multicast to 3 functions, each with 2 outputs
+      // inject -> function (multicast to [f2, f3, f4])
+      //           f2, f3, f4 each have 2 outputs
+      //
+      // Decision nodes: f2, f3, f4 (each contributes 1)
+      // CC = 1 + 1 + 1 + 1 = 4
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'f2', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f3', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f4', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'd1', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd2', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd6', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'f2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'f3', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'f4', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd1', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd2', sourcePort: 1 });
+      graph.addEdge({ source: 'f3', target: 'd3', sourcePort: 0 });
+      graph.addEdge({ source: 'f3', target: 'd4', sourcePort: 1 });
+      graph.addEdge({ source: 'f4', target: 'd5', sourcePort: 0 });
+      graph.addEdge({ source: 'f4', target: 'd6', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(4);
+
+      const details = result.metadata?.details as any;
+      expect(details?.decisionNodeCount).toBe(3); // f2, f3, f4
+    });
+
+    it('should handle multicast with mix of branching and non-branching targets', () => {
+      // Function multicasts to [function (2 outputs), debug, debug]
+      // Only the function with 2 outputs is a decision node
+      // inject -> function (multicast to [f2, d1, d2])
+      //           f2 has 2 outputs
+      //
+      // Decision nodes: f2 (contributes 1)
+      // CC = 1 + 1 = 2
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'f2', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'd1', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd2', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'f2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'd1', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'd2', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd3', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd4', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(2);
+
+      const details = result.metadata?.details as any;
+      expect(details?.decisionNodeCount).toBe(1); // f2 only
+    });
+
+    it('should handle nested multicast with branching', () => {
+      // Switch multicasts to [f1, f2], then f1 multicasts to [f3, f4]
+      // All functions have 2 outputs
+      // inject -> switch (multicast to [f1, f2])
+      //           f1 (multicast to [f3, f4])
+      //           f2 (2 outputs)
+      //           f3 (2 outputs)
+      //           f4 (2 outputs)
+      //
+      // Decision nodes:
+      // - switch: 2 outputs -> contributes 2
+      // - f2: 2 outputs -> contributes 1
+      // - f3: 2 outputs -> contributes 1
+      // - f4: 2 outputs -> contributes 1
+      // CC = 1 + 2 + 1 + 1 + 1 = 6
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 's1', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f1', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'f2', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f3', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f4', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'd1', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd2', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd6', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd7', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 's1', sourcePort: 0 });
+      graph.addEdge({ source: 's1', target: 'f1', sourcePort: 0 });
+      graph.addEdge({ source: 's1', target: 'f2', sourcePort: 0 });
+      graph.addEdge({ source: 's1', target: 'd7', sourcePort: 1 });
+      graph.addEdge({ source: 'f1', target: 'f3', sourcePort: 0 });
+      graph.addEdge({ source: 'f1', target: 'f4', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd5', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd6', sourcePort: 1 });
+      graph.addEdge({ source: 'f3', target: 'd1', sourcePort: 0 });
+      graph.addEdge({ source: 'f3', target: 'd2', sourcePort: 1 });
+      graph.addEdge({ source: 'f4', target: 'd3', sourcePort: 0 });
+      graph.addEdge({ source: 'f4', target: 'd4', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(6);
+
+      const details = result.metadata?.details as any;
+      expect(details?.decisionNodeCount).toBe(4); // switch, f2, f3, f4
+    });
+
+    it('should handle loop from inside multicast back to before multicast', () => {
+      // Switch multicasts to [f1, f2], f1 loops back to switch
+      // For CC: cycles don't affect counting, just count decision nodes
+      //
+      // Structure:
+      // inject -> switch (port0: multicast [f1, f2], port1: exit)
+      //           f1: port0 -> loops back to switch
+      //               port1 -> debug1
+      //           f2: port0 -> debug2
+      //               port1 -> debug3
+      //
+      // Decision nodes:
+      // - switch: 2 outputs -> contributes 2
+      // - f1: 2 outputs -> contributes 1
+      // - f2: 2 outputs -> contributes 1
+      // CC = 1 + 2 + 1 + 1 = 5
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 's1', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f1', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'f2', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'd1', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd2', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'd4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 's1', sourcePort: 0 });
+      graph.addEdge({ source: 's1', target: 'f1', sourcePort: 0 });
+      graph.addEdge({ source: 's1', target: 'f2', sourcePort: 0 });
+      graph.addEdge({ source: 's1', target: 'd4', sourcePort: 1 });
+      graph.addEdge({ source: 'f1', target: 's1', sourcePort: 0 }); // LOOP
+      graph.addEdge({ source: 'f1', target: 'd1', sourcePort: 1 });
+      graph.addEdge({ source: 'f2', target: 'd2', sourcePort: 0 });
+      graph.addEdge({ source: 'f2', target: 'd3', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(5);
+
+      const details = result.metadata?.details as any;
+      expect(details?.decisionNodeCount).toBe(3); // switch, f1, f2
+    });
+  });
 });
