@@ -611,6 +611,58 @@ describe('NPathComplexityMetric', () => {
     });
   });
 
+  describe('multiple entry nodes', () => {
+    it('should not multiply complexity when multiple entry nodes lead to same flow', () => {
+      // Two inject nodes both leading to the same switch
+      // Complexity should be based on the flow structure, not the number of entry points
+      // inject1 → switch → debug
+      // inject2 → switch (same switch)
+      // NPATH = 3 (switch: 2 outputs + catch-all), not 6
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n3', target: 'n4', sourcePort: 0 });
+      graph.addEdge({ source: 'n3', target: 'n5', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(3);
+    });
+
+    it('should not multiply complexity with multiple independent entry points', () => {
+      // Two inject nodes leading to independent flows
+      // inject1 → switch (3 paths)
+      // inject2 → function (1 path)
+      // NPATH should be max(3, 1) = 3, not 3 + 1 = 4
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n6', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n7', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n3', target: 'n4', sourcePort: 0 });
+      graph.addEdge({ source: 'n3', target: 'n5', sourcePort: 1 });
+      graph.addEdge({ source: 'n2', target: 'n6', sourcePort: 0 });
+      graph.addEdge({ source: 'n6', target: 'n7', sourcePort: 0 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(3);
+    });
+  });
+
   describe('multicast with branching inside broadcast', () => {
     it('should multiply independent decisions within multicast targets', () => {
       // Switch multicasts on port0 to [function1, function2], both have 2 outputs
