@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TypeScript App</title>
+    <title>Node-RED Flow Metrics Analyzer</title>
   </head>
   <body>
     <div id="app">
-      <h1>Vite + TypeScript</h1>
-      <div id="content"></div>
+      <header>
+        <h1>Node-RED Flow Metrics Analyzer</h1>
+        <p>Upload a Node-RED flow export (JSON) to analyze its metrics</p>
+      </header>
+
+      <main>
+        <section id="upload-section" class="card">
+          <h2>Upload Flow</h2>
+          <div class="upload-controls">
+            <input type="file" id="file-input" accept=".json,application/json" />
+            <button id="analyze-button" type="button" disabled>Analyze Flow</button>
+            <button id="clear-button" type="button" style="display: none;">Clear</button>
+          </div>
+          <div id="file-info" class="info-message"></div>
+          <div id="error-message" class="error-message"></div>
+        </section>
+
+        <section id="results-section" style="display: none;">
+          <div id="summary-section" class="card">
+            <h2>Summary</h2>
+            <div id="summary-content"></div>
+          </div>
+
+          <div id="components-section" class="card">
+            <h2>Components & Metrics</h2>
+            <div id="components-content"></div>
+          </div>
+
+          <div id="raw-json-section" class="card">
+            <h2>Raw JSON Report</h2>
+            <button id="toggle-json-button" type="button">Show JSON</button>
+            <pre id="json-content" style="display: none;"></pre>
+          </div>
+        </section>
+      </main>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
