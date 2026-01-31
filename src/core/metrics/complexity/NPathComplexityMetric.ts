@@ -135,7 +135,7 @@ export class NPathComplexityMetric implements IMetric {
 
     // Sum paths from each output port
     let totalPaths = 0;
-    for (const [port, edges] of edgesByPort) {
+    for (const edges of edgesByPort.values()) {
       const portPaths = this.calculatePortPaths(edges, graph, visited, processing);
       totalPaths += portPaths;
     }
