@@ -9,7 +9,9 @@ import { NodeRedNode } from '../types/node-red.types';
  * These nodes branch execution flow based on conditions
  */
 const DEFAULT_DECISION_TYPES = new Set([
-  'switch'
+  'switch',
+  'trigger',
+  'filter'
 ]);
 
 export class NodeClassifier {
@@ -27,7 +29,15 @@ export class NodeClassifier {
    * Check if a node is a decision node
    */
   isDecisionNode(node: NodeRedNode): boolean {
-    return this.decisionTypes.has(node.type);
+    if (this.decisionTypes.has(node.type)) {
+      return true;
+    }
+
+    if (node.type === 'function' && node.wires.length > 1) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
