@@ -11,7 +11,7 @@ import { NodeRedNode } from '../types/node-red.types';
 const DEFAULT_DECISION_TYPES = new Set([
   'switch',
   'trigger',
-  'filter'
+  'rbe'
 ]);
 
 export class NodeClassifier {

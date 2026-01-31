@@ -56,7 +56,7 @@ describe('NodeClassifier', () => {
       const classifier = new NodeClassifier();
       const node: NodeRedNode = {
         id: '1',
-        type: 'filter',
+        type: 'rbe',
         wires: [[]],
       };
 
@@ -146,7 +146,7 @@ describe('NodeClassifier', () => {
 
       expect(types).toContain('switch');
       expect(types).toContain('trigger');
-      expect(types).toContain('filter');
+      expect(types).toContain('rbe');
       expect(types).toHaveLength(3);
     });
   });

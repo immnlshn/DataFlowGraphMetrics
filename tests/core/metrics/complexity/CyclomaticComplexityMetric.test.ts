@@ -393,7 +393,7 @@ describe('CyclomaticComplexityMetric', () => {
       // Contribution: 1, CC = 1 + 1 = 2
       const graph = new GraphModel();
       graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
-      graph.addNode({ id: 'n2', type: 'filter', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'rbe', flowId: 'f1', isDecisionNode: true, metadata: {} });
       graph.addNode({ id: 'n3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
 
       graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
@@ -411,7 +411,7 @@ describe('CyclomaticComplexityMetric', () => {
       // Contribution: 1, CC = 1 + 1 = 2
       const graph = new GraphModel();
       graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
-      graph.addNode({ id: 'n2', type: 'filter', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'rbe', flowId: 'f1', isDecisionNode: true, metadata: {} });
       graph.addNode({ id: 'n3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
       graph.addNode({ id: 'n4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
 
@@ -430,8 +430,8 @@ describe('CyclomaticComplexityMetric', () => {
       // Each contributes 1
       // CC = 1 + 1 + 1 = 3
       const graph = new GraphModel();
-      graph.addNode({ id: 'n1', type: 'filter', flowId: 'f1', isDecisionNode: true, metadata: {} });
-      graph.addNode({ id: 'n2', type: 'filter', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n1', type: 'rbe', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'rbe', flowId: 'f1', isDecisionNode: true, metadata: {} });
       graph.addNode({ id: 'n3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
 
       graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
@@ -477,7 +477,7 @@ describe('CyclomaticComplexityMetric', () => {
       graph.addNode({ id: 'n1', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
       graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
       graph.addNode({ id: 'n3', type: 'trigger', flowId: 'f1', isDecisionNode: true, metadata: {} });
-      graph.addNode({ id: 'n4', type: 'filter', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'rbe', flowId: 'f1', isDecisionNode: true, metadata: {} });
       graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
 
       // Switch with 2 outputs

@@ -35,7 +35,7 @@ export class CyclomaticComplexityMetric implements IMetric {
 
     // Trigger and filter nodes always have 2 branches (pass or block)
     // Regardless of their output configuration
-    if (nodeType === 'trigger' || nodeType === 'filter') {
+    if (nodeType === 'trigger' || nodeType === 'rbe') {
       return 1;
     }
 
