@@ -729,6 +729,41 @@ describe('CyclomaticComplexityMetric', () => {
       // Expected: 4 (1 + 3 for switch with 3 outputs)
       expect(result.value).toBe(4);
     });
+
+    it('should handle two switches in sequence with one path looping back', () => {
+      // Two switches where the first loops back, second is in direct path
+      // Structure:
+      // inject -> function -> switch1 (2 outputs)
+      //   port0 -> switch2 (2 outputs)
+      //     port0 -> debug1
+      //     port1 -> debug2
+      //   port1 -> function (loops back)
+      //
+      // Decision nodes:
+      // - switch1: 2 outputs -> contributes 2
+      // - switch2: 2 outputs -> contributes 2
+      // Expected: CC = 1 + 2 + 2 = 5
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} }); // switch1
+      graph.addNode({ id: 'n4', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} }); // switch2
+      graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} }); // debug1
+      graph.addNode({ id: 'n6', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} }); // debug2
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 }); // inject -> function
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 }); // function -> switch1
+      graph.addEdge({ source: 'n3', target: 'n4', sourcePort: 0 }); // switch1 port0 -> switch2
+      graph.addEdge({ source: 'n3', target: 'n2', sourcePort: 1 }); // switch1 port1 -> function (loop)
+      graph.addEdge({ source: 'n4', target: 'n5', sourcePort: 0 }); // switch2 port0 -> debug1
+      graph.addEdge({ source: 'n4', target: 'n6', sourcePort: 1 }); // switch2 port1 -> debug2
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      // Expected: 5 (1 + 2 + 2)
+      expect(result.value).toBe(5);
+    });
   });
 
   describe('multicast with branching inside broadcast', () => {
