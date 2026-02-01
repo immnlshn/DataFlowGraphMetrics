@@ -82,6 +82,9 @@ export class FlowParser {
     for (const item of data) {
       if (isNode(item)) {
         const node = item as NodeRedNode;
+        if (node.type === 'comment') {
+          continue;
+        }
         if (!node.z || enabledTabIds.has(node.z)) {
           nodes.push(node);
         }

@@ -98,8 +98,11 @@ describe('Metrics Integration', () => {
 
       expect(result.metrics.get('density')?.value).toBe(0.1429);
 
-      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(3);
-      expect(result.metrics.get('npath-complexity')?.value).toBe(4);
+      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(5);
+      // NPath: 5 distinct paths through the graph
+      // (switch1 port0→1, switch1 port1→switch2 port0→1, switch1 port1→switch2 port1→1,
+      //  switch1 port1→switch2 catch-all→1, switch1 catch-all→1)
+      expect(result.metrics.get('npath-complexity')?.value).toBe(5);
     });
   });
 
@@ -130,14 +133,62 @@ describe('Metrics Integration', () => {
       expect(r1.metrics.get('cyclomatic-complexity')?.value).toBe(1);
       expect(r1.metrics.get('npath-complexity')?.value).toBe(1);
 
-      // Component 2 (4 nodes, switch)
+      // Component 2 (4 nodes, switch with 2 outputs)
       expect(r2.metrics.get('vertex-count')?.value).toBe(4);
       expect(r2.metrics.get('edge-count')?.value).toBe(3);
       expect(r2.metrics.get('fan-in')?.value).toBe(1);
       expect(r2.metrics.get('fan-out')?.value).toBe(2);
       expect(r2.metrics.get('density')?.value).toBe(0.25);
-      expect(r2.metrics.get('cyclomatic-complexity')?.value).toBe(2);
-      expect(r2.metrics.get('npath-complexity')?.value).toBe(2);
+      expect(r2.metrics.get('cyclomatic-complexity')?.value).toBe(3);
+      // NPath: switch with 2 outputs: (2+1) = 3
+      expect(r2.metrics.get('npath-complexity')?.value).toBe(3);
+    });
+  });
+
+  describe('multicast-flow.json', () => {
+    it('should not increase complexity for multicast (parallel execution without branching)', () => {
+      const json = loadFixture('multicast-flow.json');
+      const parsed = parser.parse(json);
+      const flowId = parsed.tabs[0].id;
+      const nodesForTab = parser.getNodesForTab(parsed.nodes, flowId);
+      const graph = builder.build(nodesForTab, flowId);
+      const components = finder.findComponents(graph);
+
+      expect(components).toHaveLength(1);
+      const component = components[0];
+
+      const result = registry.computeAll(component);
+
+      // Structure: inject -> switch (1 output port) -> 3 debug nodes in parallel
+      // This is multicast, not branching, so complexity should remain 1
+      // 5 nodes: inject + switch + 3 debug nodes
+      expect(result.metrics.get('vertex-count')?.value).toBe(5);
+      // 4 edges: inject->switch, switch->debug1, switch->debug2, switch->debug3
+      expect(result.metrics.get('edge-count')?.value).toBe(4);
+
+      // Fan-out should be high due to multicast
+      expect(result.metrics.get('fan-out')?.value).toBe(3);
+
+      // Switch with 1 output has 2 branches: pass or catch-all
+      // Even though it multicasts, it still introduces branching
+      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(2);
+      // NPath: switch with 1 output: (1+1) = 2
+      expect(result.metrics.get('npath-complexity')?.value).toBe(2);
+
+      // Verify the complexity interpretation
+      const ccResult = result.metrics.get('cyclomatic-complexity');
+      expect(ccResult?.metadata?.details).toMatchObject({
+        decisionNodeCount: 1,
+        formula: '1 + sum_{n in D} branches(n) where branches vary by node type'
+      });
+
+      const npathResult = result.metrics.get('npath-complexity');
+      expect(npathResult?.metadata?.details).toMatchObject({
+        algorithm: 'DFS with memoization and cycle detection',
+        nodeCount: 5
+      });
+      // NPath value should be 2 (1 path through switch output + 1 catch-all)
+      expect(npathResult?.value).toBe(2);
     });
   });
 

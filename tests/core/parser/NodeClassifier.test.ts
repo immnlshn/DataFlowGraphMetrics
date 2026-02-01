@@ -30,6 +30,39 @@ describe('NodeClassifier', () => {
       expect(classifier.isDecisionNode(node)).toBe(false);
     });
 
+    it('should identify function nodes with multiple outputs as decision nodes', () => {
+      const classifier = new NodeClassifier();
+      const node: NodeRedNode = {
+        id: '1',
+        type: 'function',
+        wires: [[], []],
+      };
+
+      expect(classifier.isDecisionNode(node)).toBe(true);
+    });
+
+    it('should identify trigger nodes as decision nodes', () => {
+      const classifier = new NodeClassifier();
+      const node: NodeRedNode = {
+        id: '1',
+        type: 'trigger',
+        wires: [[]],
+      };
+
+      expect(classifier.isDecisionNode(node)).toBe(true);
+    });
+
+    it('should identify filter nodes as decision nodes', () => {
+      const classifier = new NodeClassifier();
+      const node: NodeRedNode = {
+        id: '1',
+        type: 'rbe',
+        wires: [[]],
+      };
+
+      expect(classifier.isDecisionNode(node)).toBe(true);
+    });
+
     it('should not identify inject nodes as decision nodes', () => {
       const classifier = new NodeClassifier();
       const node: NodeRedNode = {
@@ -112,7 +145,9 @@ describe('NodeClassifier', () => {
       const types = classifier.getDecisionTypes();
 
       expect(types).toContain('switch');
-      expect(types).toHaveLength(1);
+      expect(types).toContain('trigger');
+      expect(types).toContain('rbe');
+      expect(types).toHaveLength(3);
     });
   });
 

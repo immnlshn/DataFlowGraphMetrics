@@ -48,6 +48,12 @@ export class GraphModel implements Graph {
     return this.edges.filter(edge => edge.source === nodeId);
   }
 
+  getOutgoingPorts(nodeId: string): ReadonlySet<number> {
+      const outgoing = this.getOutgoing(nodeId);
+      const ports = new Set<number>(outgoing.map(e => e.sourcePort));
+      return ports;
+  }
+
   /**
    * Get all node IDs
    */
