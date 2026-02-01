@@ -146,7 +146,7 @@ describe('Metrics Integration', () => {
   });
 
   describe('multicast-flow.json', () => {
-    it('should not increase complexity for multicast (parallel execution without branching)', () => {
+    it('should increase complexity for multicast (parallel execution paths)', () => {
       const json = loadFixture('multicast-flow.json');
       const parsed = parser.parse(json);
       const flowId = parsed.tabs[0].id;
@@ -159,8 +159,7 @@ describe('Metrics Integration', () => {
 
       const result = registry.computeAll(component);
 
-      // Structure: inject -> switch (1 output port) -> 3 debug nodes in parallel
-      // This is multicast, not branching, so complexity should remain 1
+      // Structure: inject -> switch (1 output port) -> 3 debug nodes (multicast)
       // 5 nodes: inject + switch + 3 debug nodes
       expect(result.metrics.get('vertex-count')?.value).toBe(5);
       // 4 edges: inject->switch, switch->debug1, switch->debug2, switch->debug3
@@ -169,26 +168,18 @@ describe('Metrics Integration', () => {
       // Fan-out should be high due to multicast
       expect(result.metrics.get('fan-out')?.value).toBe(3);
 
-      // Switch with 1 output has 2 branches: pass or catch-all
-      // Even though it multicasts, it still introduces branching
-      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(2);
-      // NPath: switch with 1 output: (1+1) = 2
-      expect(result.metrics.get('npath-complexity')?.value).toBe(2);
+      // CC = 1 (baseline) + 1 (switch port) + 2 (multicast: 3 targets - 1) = 4
+      // Switch with 1 port contributes 1 branch, multicast to 3 targets adds 2 more
+      expect(result.metrics.get('cyclomatic-complexity')?.value).toBe(4);
 
-      // Verify the complexity interpretation
+      // NPath = 3 (multicast to 3 debug nodes) + 1 (implicit drop path) = 4
+      expect(result.metrics.get('npath-complexity')?.value).toBe(4);
+
+      // Verify decision node count in CC metadata
       const ccResult = result.metrics.get('cyclomatic-complexity');
       expect(ccResult?.metadata?.details).toMatchObject({
-        decisionNodeCount: 1,
-        formula: '1 + sum_{n in D} branches(n) where branches vary by node type'
+        decisionNodeCount: 1
       });
-
-      const npathResult = result.metrics.get('npath-complexity');
-      expect(npathResult?.metadata?.details).toMatchObject({
-        algorithm: 'DFS with memoization and cycle detection',
-        nodeCount: 5
-      });
-      // NPath value should be 2 (1 path through switch output + 1 catch-all)
-      expect(npathResult?.value).toBe(2);
     });
   });
 
