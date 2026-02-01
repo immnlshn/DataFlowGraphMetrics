@@ -673,6 +673,64 @@ describe('CyclomaticComplexityMetric', () => {
     });
   });
 
+  describe('edge cases: multiple ports to same target', () => {
+    it('should handle exec node with multiple output ports all targeting same node', () => {
+      // Node with 3 output ports, all connecting to the same target
+      // Structure: inject -> exec(3 ports) -> debug
+      //
+      // Exec node has 3 output ports (stdout, stderr, return code)
+      // Marked as a decision node (isDecisionNode: true)
+      // Expected: CC = 1 + (3 - 1) = 3
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'exec', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      // Three different output ports, all targeting the same node
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 1 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 2 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      // Expected: 3 (1 + 2 branches)
+      expect(result.value).toBe(3);
+    });
+
+    it('should handle switch with 3 outputs where one path loops back', () => {
+      // Edge case: Switch with 3 outputs, where one output creates a loop
+      // Structure:
+      // inject -> switch (3 outputs + implicit catch-all)
+      //   port 0 -> debug1 (direct exit)
+      //   port 1 -> function -> switch (loop back)
+      //   port 2 -> debug2 (direct exit)
+      //
+      // Decision nodes:
+      // - switch: 3 outputs -> contributes 3 (switch uses out(n) - 0 formula)
+      // Expected: CC = 1 + 3 = 4
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n4', sourcePort: 0 }); // port0 -> debug1
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 1 }); // port1 -> function (loop)
+      graph.addEdge({ source: 'n2', target: 'n5', sourcePort: 2 }); // port2 -> debug2
+      graph.addEdge({ source: 'n3', target: 'n2', sourcePort: 0 }); // loop back to switch
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      // Expected: 4 (1 + 3 for switch with 3 outputs)
+      expect(result.value).toBe(4);
+    });
+  });
+
   describe('multicast with branching inside broadcast', () => {
     it('should count all decision nodes regardless of multicast', () => {
       // Switch multicasts on port0 to [function1, function2], both have 2 outputs

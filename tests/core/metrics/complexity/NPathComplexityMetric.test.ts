@@ -663,6 +663,69 @@ describe('NPathComplexityMetric', () => {
     });
   });
 
+  describe('edge cases: multiple ports to same target', () => {
+    it('should handle exec node with multiple output ports all targeting same node', () => {
+      // Node with 3 output ports, all connecting to the same target
+      // Structure: inject -> exec(3 ports) -> debug
+      //
+      // Exec node has 3 output ports (stdout, stderr, return code)
+      // Not marked as a decision node (isDecisionNode: false)
+      // Expected: NPATH = 1 (no decision node, linear flow)
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'exec', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      // Three different output ports, all targeting the same node
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 1 });
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 2 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      // Expected: 1 (no decision node)
+      expect(result.value).toBe(1);
+    });
+
+    it('should handle switch with 3 outputs where one path loops back', () => {
+      // Edge case: Switch with 3 outputs, where one output creates a loop
+      // Structure:
+      // inject -> switch (3 outputs + implicit catch-all)
+      //   port 0 -> debug1 (direct exit)
+      //   port 1 -> function -> switch (loop back)
+      //   port 2 -> debug2 (direct exit)
+      //
+      // Enumerated paths:
+      // 1. switch(port0) -> debug1 (direct)
+      // 2. switch(port1) -> function -> switch(port0) -> debug1 (loop then exit port0)
+      // 3. switch(port1) -> function -> switch(port2) -> debug2 (loop then exit port2)
+      // 4. switch(port1) -> function -> switch(catch-all) -> STOP (loop then catch-all)
+      // 5. switch(port2) -> debug2 (direct)
+      // 6. switch(catch-all) -> STOP (direct)
+      // Expected: NPATH = 6
+      const graph = new GraphModel();
+      graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n2', type: 'switch', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'n3', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n4', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'n5', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'n1', target: 'n2', sourcePort: 0 });
+      graph.addEdge({ source: 'n2', target: 'n4', sourcePort: 0 }); // port0 -> debug1
+      graph.addEdge({ source: 'n2', target: 'n3', sourcePort: 1 }); // port1 -> function (loop)
+      graph.addEdge({ source: 'n2', target: 'n5', sourcePort: 2 }); // port2 -> debug2
+      graph.addEdge({ source: 'n3', target: 'n2', sourcePort: 0 }); // loop back to switch
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      // Expected: 6 paths
+      expect(result.value).toBe(6);
+    });
+  });
+
   describe('multicast with branching inside broadcast', () => {
     it('should multiply independent decisions within multicast targets', () => {
       // Switch multicasts on port0 to [function1, function2], both have 2 outputs
