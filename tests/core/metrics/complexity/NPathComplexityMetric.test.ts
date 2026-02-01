@@ -766,6 +766,50 @@ describe('NPathComplexityMetric', () => {
       // Expected: 8 paths
       expect(result.value).toBe(8);
     });
+
+    it('should handle nested decision nodes with loop from second level (flows5)', () => {
+      // Based on flows(5).json
+      // Structure:
+      // inject -> function8 (2 outputs, decision)
+      //             port0 -> function21 (2 outputs, decision)
+      //                        port0 -> debug21
+      //                        port1 -> function8 (LOOP!)
+      //             port1 -> function22 (2 outputs, decision)
+      //                        port0 -> debug28
+      //                        port1 -> debug29
+      //
+      // Path enumeration:
+      // Direct paths (no loop):
+      //   1. function8(port0) -> function21(port0) -> debug21
+      //   2. function8(port1) -> function22(port0) -> debug28
+      //   3. function8(port1) -> function22(port1) -> debug29
+      // Loop paths (function21 loops back to function8):
+      //   4. function8(port0) -> function21(port1) -> loop -> function8(port0) -> function21(port0) -> debug21
+      //   5. function8(port0) -> function21(port1) -> loop -> function8(port1) -> function22(port0) -> debug28
+      //   6. function8(port0) -> function21(port1) -> loop -> function8(port1) -> function22(port1) -> debug29
+      // Total: 6 paths
+      const graph = new GraphModel();
+      graph.addNode({ id: 'inject', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'func8', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'func21', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'func22', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'debug21', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'debug28', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'debug29', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'inject', target: 'func8', sourcePort: 0 });
+      graph.addEdge({ source: 'func8', target: 'func21', sourcePort: 0 });
+      graph.addEdge({ source: 'func8', target: 'func22', sourcePort: 1 });
+      graph.addEdge({ source: 'func21', target: 'debug21', sourcePort: 0 });
+      graph.addEdge({ source: 'func21', target: 'func8', sourcePort: 1 }); // LOOP back
+      graph.addEdge({ source: 'func22', target: 'debug28', sourcePort: 0 });
+      graph.addEdge({ source: 'func22', target: 'debug29', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(6);
+    });
   });
 
   describe('multicast with branching inside broadcast', () => {

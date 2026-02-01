@@ -764,6 +764,39 @@ describe('CyclomaticComplexityMetric', () => {
       // Expected: 5 (1 + 2 + 2)
       expect(result.value).toBe(5);
     });
+
+    it('should handle nested decision nodes with loop from second level (flows5)', () => {
+      // Based on flows(5).json
+      // Structure:
+      // inject -> function8 (2 outputs) -> function21 (2 outputs, loops back) + function22 (2 outputs)
+      //
+      // Decision nodes:
+      // - function8: 2 outputs = 1 branch
+      // - function21: 2 outputs = 1 branch
+      // - function22: 2 outputs = 1 branch
+      // CC = 1 + 1 + 1 + 1 = 4
+      const graph = new GraphModel();
+      graph.addNode({ id: 'inject', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'func8', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'func21', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'func22', type: 'function', flowId: 'f1', isDecisionNode: true, metadata: {} });
+      graph.addNode({ id: 'debug21', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'debug28', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+      graph.addNode({ id: 'debug29', type: 'debug', flowId: 'f1', isDecisionNode: false, metadata: {} });
+
+      graph.addEdge({ source: 'inject', target: 'func8', sourcePort: 0 });
+      graph.addEdge({ source: 'func8', target: 'func21', sourcePort: 0 });
+      graph.addEdge({ source: 'func8', target: 'func22', sourcePort: 1 });
+      graph.addEdge({ source: 'func21', target: 'debug21', sourcePort: 0 });
+      graph.addEdge({ source: 'func21', target: 'func8', sourcePort: 1 }); // LOOP back
+      graph.addEdge({ source: 'func22', target: 'debug28', sourcePort: 0 });
+      graph.addEdge({ source: 'func22', target: 'debug29', sourcePort: 1 });
+
+      const component = createComponent(graph);
+      const result = metric.compute(component);
+
+      expect(result.value).toBe(4);
+    });
   });
 
   describe('multicast with branching inside broadcast', () => {
