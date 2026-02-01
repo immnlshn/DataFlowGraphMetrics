@@ -568,7 +568,8 @@ describe('NPathComplexityMetric', () => {
     it('should handle simple cycle with no exit', () => {
       // Simple cycle: n1 -> n2 -> n3 -> n2 (back edge)
       // No terminal nodes (cycle has no exit)
-      // NPATH = 1 (infinite loop is counted as single path)
+      // Baseline: 1 path (graph is not empty)
+      // NPATH = 1
       const graph = new GraphModel();
       graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
       graph.addNode({ id: 'n2', type: 'function', flowId: 'f1', isDecisionNode: false, metadata: {} });
@@ -587,11 +588,11 @@ describe('NPathComplexityMetric', () => {
     it('should handle cycle with decision nodes and exit path', () => {
       // Cycle with switch: inject -> switch -> function -> switch (back edge)
       // Switch has 2 outputs: port0 loops back via function, port1 exits to debug
-      // Paths:
-      // 1. inject -> switch(port0) -> function -> switch(port0) -> ... (infinite loop counted as 1)
-      // 2. inject -> switch(port0) -> function -> switch(port1) -> debug (exit from within loop)
-      // 3. inject -> switch(port1) -> debug (direct exit)
-      // 4. inject -> switch(catch-all) -> STOP
+      // Enumerated paths:
+      // 1. switch(port0) -> function -> switch(port1) -> debug (loop then exit)
+      // 2. switch(port0) -> function -> switch(catch-all) -> STOP (loop then catch-all)
+      // 3. switch(port1) -> debug (direct exit)
+      // 4. switch(catch-all) -> STOP (direct)
       // NPATH = 4
       const graph = new GraphModel();
       graph.addNode({ id: 'n1', type: 'inject', flowId: 'f1', isDecisionNode: false, metadata: {} });
