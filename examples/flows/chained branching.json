@@ -1,0 +1,371 @@
+[
+    {
+        "id": "79a8af87d7b79991",
+        "type": "tab",
+        "label": "Chained Branching",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "908a8a03f9d9b771",
+        "type": "inject",
+        "z": "79a8af87d7b79991",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 300,
+        "wires": [
+            [
+                "5c2ed9a26a2fad97"
+            ]
+        ]
+    },
+    {
+        "id": "5c2ed9a26a2fad97",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 1",
+        "func": "\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 300,
+        "wires": [
+            [
+                "4832843beb56a004"
+            ],
+            [
+                "72e8a82b307545a9"
+            ]
+        ]
+    },
+    {
+        "id": "4832843beb56a004",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 2",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 280,
+        "wires": [
+            [
+                "b21b082bfb4d54ea"
+            ]
+        ]
+    },
+    {
+        "id": "72e8a82b307545a9",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 3",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 320,
+        "wires": [
+            [
+                "b21b082bfb4d54ea"
+            ]
+        ]
+    },
+    {
+        "id": "b21b082bfb4d54ea",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 4",
+        "func": "\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 300,
+        "wires": [
+            [
+                "4f8681694dab0f22"
+            ],
+            [
+                "614587faef102832"
+            ]
+        ]
+    },
+    {
+        "id": "4f8681694dab0f22",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 5",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 280,
+        "wires": [
+            [
+                "7df1bd119b3fe730"
+            ]
+        ]
+    },
+    {
+        "id": "614587faef102832",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 6",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 320,
+        "wires": [
+            [
+                "7df1bd119b3fe730"
+            ]
+        ]
+    },
+    {
+        "id": "7df1bd119b3fe730",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 7",
+        "func": "\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 300,
+        "wires": [
+            [
+                "4a0f391d3b560353"
+            ],
+            [
+                "32652cd79c137716"
+            ]
+        ]
+    },
+    {
+        "id": "4a0f391d3b560353",
+        "type": "debug",
+        "z": "79a8af87d7b79991",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "32652cd79c137716",
+        "type": "debug",
+        "z": "79a8af87d7b79991",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1220,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "9d0887949ce69b33",
+        "type": "inject",
+        "z": "79a8af87d7b79991",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "50b329a6f442b7d2"
+            ]
+        ]
+    },
+    {
+        "id": "50b329a6f442b7d2",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 1",
+        "func": "\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 140,
+        "wires": [
+            [
+                "8962485e59c6e5ee"
+            ],
+            [
+                "e260af2c46babf4d"
+            ]
+        ]
+    },
+    {
+        "id": "8962485e59c6e5ee",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 2",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 120,
+        "wires": [
+            [
+                "7641a7d6b821ac88"
+            ]
+        ]
+    },
+    {
+        "id": "e260af2c46babf4d",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 3",
+        "func": "\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 160,
+        "wires": [
+            [
+                "7641a7d6b821ac88"
+            ]
+        ]
+    },
+    {
+        "id": "7641a7d6b821ac88",
+        "type": "function",
+        "z": "79a8af87d7b79991",
+        "name": "function 4",
+        "func": "\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 140,
+        "wires": [
+            [
+                "ef11a45d099032f5"
+            ],
+            [
+                "fa9a1f4c20a90fbd"
+            ]
+        ]
+    },
+    {
+        "id": "ef11a45d099032f5",
+        "type": "debug",
+        "z": "79a8af87d7b79991",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "fa9a1f4c20a90fbd",
+        "type": "debug",
+        "z": "79a8af87d7b79991",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 160,
+        "wires": []
+    }
+]
