@@ -140,3 +140,17 @@ The project includes comprehensive test coverage:
 - **Integration tests**: Multiple components working together within modules
 - **End-to-end tests**: Full public API through `analyzeFlow()`
 - 200+ tests total validating all functionality
+
+## Contributors
+
+- **Immanuel Sohn**:<br>
+  [isohn1@smail.uni-koeln.de](mailto:isohn@smail.uni-koeln.de)
+- **Jan-Philipp Lamers**:<br>
+  [jlamers1@smail.uni-koeln.de](mailto:jlamers1@smail.uni-koeln.de)
+
+
+Contributions are welcome! Feel free to submit a pull request if you'd like to help improve this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
